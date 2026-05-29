@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../.props/test.props"/>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.*"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Hexed\Hexed.csproj"/>
+    <ProjectReference Include="..\Hexed.Analyzer\Hexed.Analyzer.csproj"/>
+  </ItemGroup>
+</Project>

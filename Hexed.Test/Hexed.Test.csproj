@@ -1,0 +1,7 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../.props/test.props"/>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Hexed\Hexed.csproj"/>
+  </ItemGroup>
+</Project>

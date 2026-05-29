@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="Example/Example.csproj" />
+  <Project Path="Hexed.Analyzer.Test/Hexed.Analyzer.Test.csproj" />
+  <Project Path="Hexed.Analyzer/Hexed.Analyzer.csproj" />
+  <Project Path="Hexed.AspNetCore.OpenApi/Hexed.AspNetCore.OpenApi.csproj" />
+  <Project Path="Hexed.AspNetCore/Hexed.AspNetCore.csproj" />
+  <Project Path="Hexed.Test/Hexed.Test.csproj" />
+  <Project Path="Hexed/Hexed.csproj" />
+</Solution>

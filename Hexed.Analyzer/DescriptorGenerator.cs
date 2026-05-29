@@ -219,7 +219,7 @@ public sealed class DescriptorGenerator : IIncrementalGenerator
         sb.AppendLine("    [System.Runtime.CompilerServices.ModuleInitializer]");
         sb.AppendLine("    internal static void Initialize()");
         sb.AppendLine("    {");
-        sb.AppendLine("        global::Hexed.Modules.Descriptor = new GeneratedDescriptor();");
+        sb.AppendLine("        global::Hexed.Modules.Descriptor = new global::GeneratedDescriptor();");
         sb.AppendLine("    }");
         sb.AppendLine("}");
 

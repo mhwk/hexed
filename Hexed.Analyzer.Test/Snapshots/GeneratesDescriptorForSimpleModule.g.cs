@@ -64,6 +64,6 @@ internal static class HexedInitializer
     [System.Runtime.CompilerServices.ModuleInitializer]
     internal static void Initialize()
     {
-        global::Hexed.Modules.Descriptor = new GeneratedDescriptor();
+        global::Hexed.Modules.Descriptor = new global::GeneratedDescriptor();
     }
 }

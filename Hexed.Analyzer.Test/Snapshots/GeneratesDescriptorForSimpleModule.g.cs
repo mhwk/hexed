@@ -51,10 +51,10 @@ public sealed class GeneratedDescriptor : Descriptor
 
     public void InvokeConfigure(object module, Type configurableType, object dependency)
     {
-        if (module is global::ConfiguringModule m_ConfiguringModule && configurableType == typeof(global::ModuleViaConfigure))
-        { ((global::ConfiguringModule)m_ConfiguringModule).Configure((global::ModuleViaConfigure)dependency); return; }
-        if (module is global::ConfiguringModule m_ConfiguringModule && configurableType == typeof(global::SomeComponent))
-        { ((global::ConfiguringModule)m_ConfiguringModule).Configure((global::SomeComponent)dependency); return; }
+        if (module is global::ConfiguringModule && configurableType == typeof(global::ModuleViaConfigure))
+        { ((global::ConfiguringModule)module).Configure((global::ModuleViaConfigure)dependency); return; }
+        if (module is global::ConfiguringModule && configurableType == typeof(global::SomeComponent))
+        { ((global::ConfiguringModule)module).Configure((global::SomeComponent)dependency); return; }
         throw new InvalidOperationException($"Unknown configure invocation {module.GetType()} / {configurableType}");
     }
 }

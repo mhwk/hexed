@@ -203,9 +203,9 @@ public sealed class DescriptorGenerator : IIncrementalGenerator
             foreach (var configured in allConfigured)
             {
                 sb.AppendLine(
-                    $"        if (module is {GlobalType(module)} m_{Sanitize(module)} && configurableType == typeof({GlobalType(configured)}))");
+                    $"        if (module is {GlobalType(module)} && configurableType == typeof({GlobalType(configured)}))");
                 sb.AppendLine(
-                    $"        {{ (({GlobalType(module)})m_{Sanitize(module)}).Configure(({GlobalType(configured)})dependency); return; }}");
+                    $"        {{ (({GlobalType(module)})module).Configure(({GlobalType(configured)})dependency); return; }}");
             }
         }
 
@@ -240,6 +240,4 @@ public sealed class DescriptorGenerator : IIncrementalGenerator
     private static string GlobalType(INamedTypeSymbol symbol) =>
         $"global::{symbol.ToDisplayString()}";
 
-    private static string Sanitize(INamedTypeSymbol symbol) =>
-        symbol.ToDisplayString().Replace(".", "_").Replace("<", "_").Replace(">", "_");
 }

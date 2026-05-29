@@ -8,6 +8,8 @@ public sealed class GeneratedDescriptor : Descriptor
 {
     public IEnumerable<Type> UsedModules(Type moduleType)
     {
+        if (moduleType == typeof(AppModule))
+            return [typeof(OtherModule)];
         return [];
     }
 

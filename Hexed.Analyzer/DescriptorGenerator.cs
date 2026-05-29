@@ -101,7 +101,7 @@ public sealed class DescriptorGenerator : IIncrementalGenerator
         sb.AppendLine("    {");
         foreach (var module in allModules.Values)
         {
-            var used = GetInterfaceArguments(module, "Hexed.Use<T>")
+            var used = GetInterfaceArguments(module, "Hexed.Use<TModule>")
                 .Where(IsModule)
                 .ToList();
 
@@ -143,7 +143,7 @@ public sealed class DescriptorGenerator : IIncrementalGenerator
         sb.AppendLine("    {");
         foreach (var module in allModules.Values)
         {
-            var configured = GetInterfaceArguments(module, "Hexed.Configure<T>")
+            var configured = GetInterfaceArguments(module, "Hexed.Configure<TComponent>")
                 .Where(IsModule)
                 .ToList();
 
@@ -164,7 +164,7 @@ public sealed class DescriptorGenerator : IIncrementalGenerator
         sb.AppendLine("    {");
         foreach (var module in allModules.Values)
         {
-            var components = GetInterfaceArguments(module, "Hexed.Configure<T>")
+            var components = GetInterfaceArguments(module, "Hexed.Configure<TComponent>")
                 .Where(t => !IsModule(t))
                 .ToList();
 
@@ -198,7 +198,7 @@ public sealed class DescriptorGenerator : IIncrementalGenerator
         sb.AppendLine("    {");
         foreach (var module in allModules.Values)
         {
-            var allConfigured = GetInterfaceArguments(module, "Hexed.Configure<T>").ToList();
+            var allConfigured = GetInterfaceArguments(module, "Hexed.Configure<TComponent>").ToList();
 
             foreach (var configured in allConfigured)
             {

@@ -12,6 +12,10 @@
 | `Hexed.Analyzer.Test/` | `net10.0` | xUnit tests for source generator |
 | `Example/` | `net10.0` | Sample app — references `Hexed.Analyzer` as analyzer (not assembly ref) |
 
+## Git & Committing
+
+- **Never commit changes unless explicitly asked by the user.** Always ask for permission before staging or committing any files.
+
 ## Build & Test
 
 ```powershell
@@ -48,7 +52,7 @@ No special order required (no codegen step before build). The source generator r
 
 ## Shared build properties (`.props/`)
 
-- `common.props`: `net10.0`, C# 12, nullable enabled, implicit usings disabled.
+- `common.props`: `net10.0`, C# 14, nullable enabled, implicit usings disabled.
 - `test.props`: imports `common.props` + xUnit, AwesomeAssertions (not FluentAssertions), coverlet, Microsoft.NET.Test.Sdk.
 - `library.props`: imports `common.props` (base for libraries).
 - `analyzer.props`: imports `library.props` + `Microsoft.CodeAnalysis.CSharp 4.*`, `IsRoslynComponent=true`.

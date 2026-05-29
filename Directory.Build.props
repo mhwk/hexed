@@ -1,7 +1,9 @@
 <Project>
   <PropertyGroup>
-    <Version>0.7.0</Version>
+    <Version>0.8.0</Version>
     <PackageReleaseNotes>
+      0.8.0
+      - Fixed DescriptorGenerator.
       0.7.0
       - Improved descriptor.
       0.6.0
@@ -9,7 +11,7 @@
       0.5.0
       - Prettier class names in mermaid output.
       0.4.0
-      - Allow injection of custom WebApplication runner.
+      - Allow injection of RunWebApplication delegate.
       0.3.0
       - Publish readme and license.
       0.2.0

@@ -115,6 +115,35 @@ public class ModulesTest
         modules.OfType<Globbed>().Should().HaveCount(0);
     }
 
+    [Theory]
+    [InlineData("!*")]
+    [InlineData("!Hexed.Test.ModulesTest.Globbed")]
+    [InlineData("!*.Globbed")]
+    [InlineData("*;!*.Globbed")]
+    [InlineData("!*;*.Globbed")]
+    [InlineData("!*.Globbed;*")]
+    public void GlobbedModuleIsNotLoadedDueToExclusion(string? globPattern)
+    {
+        Environment.SetEnvironmentVariable("HEXED", globPattern);
+
+        var modules = new Modules();
+        modules.Load<Globbing>();
+        modules.OfType<Globbed>().Should().HaveCount(0);
+    }
+
+    [Theory]
+    [InlineData("!Foo")]
+    [InlineData("!Foo.Bar")]
+    [InlineData("*;!Foo")]
+    public void GlobbedModuleIsLoadedDespiteExclusion(string? globPattern)
+    {
+        Environment.SetEnvironmentVariable("HEXED", globPattern);
+
+        var modules = new Modules();
+        modules.Load<Globbing>();
+        modules.OfType<Globbed>().Should().HaveCount(1);
+    }
+
     private sealed class ModuleA : Module;
 
     private sealed class ModuleB : Use<ModuleA>

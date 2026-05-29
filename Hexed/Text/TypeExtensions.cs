@@ -20,7 +20,7 @@ public static class TypeExtensions
 
             var builder = new StringBuilder();
 
-            if (!string.IsNullOrEmpty(type.Namespace) && !type.IsGenericParameter)
+            if (!string.IsNullOrEmpty(type.Namespace) && !type.IsGenericParameter && !type.IsNested)
             {
                 builder.Append(type.Namespace).Append('.');
             }

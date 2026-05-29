@@ -29,7 +29,7 @@ No special order required (no codegen step before build). The source generator r
 
 - **Marker-interface DI**: Dependencies declared via interface inheritance (`Use<T>`, `Glob<T>`, `Configure<T>`), not constructor injection or attributes.
 - **Two-phase resolution**: (1) Load modules & resolve `Use<T>`/`Glob<T>`/`Configure<TModule>` dependencies. (2) Push non-module components (e.g., `WebApplicationBuilder`) via `Modules.Configure(TComponent)`.
-- **Glob-based conditional loading**: `Glob<T>` loads only if type name matches `HEXED` env var (semicolon-separated glob patterns). Unset `HEXED` → all globs loaded.
+- **Glob-based conditional loading**: `Glob<T>` loads only if type name matches `HEXED` env var (semicolon-separated glob patterns). Prepending `!` to a pattern makes it an exclusion rule — if any exclusion matches the module is not loaded. Unset `HEXED` → all globs loaded.
 - **AOT safety**: `Hexed.Analyzer` generates `GeneratedModuleDescriptor` + `[ModuleInitializer]` at compile time so runtime reflection is unnecessary. Both `Hexed` and `Hexed.AspNetCore` are `IsAotCompatible=true`.
 - **Entrypoints**: `new MyModule().RunAsync(args)` (AspNetCore), or manually `new Modules().Load(module).Configure(component)` for custom hosts.
 

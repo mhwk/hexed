@@ -58,6 +58,12 @@ The `HEXED` environment variable accepts a semicolon-separated list of glob patt
 export HEXED=Example.*;AnotherExample.*
 ```
 
+Patterns prepended with `!` act as exclusion rules — if any exclusion pattern matches, the module is not loaded regardless of inclusion matches.
+
+```sh
+export HEXED=Example.*;!Example.SomeModule
+```
+
 If `HEXED` is not set, all `Glob<T>` dependencies are loaded as normal.
 
 ### `Configure<TComponent>`

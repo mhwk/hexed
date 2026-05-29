@@ -1,5 +1,6 @@
 ﻿using Hexed.Text;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Hexed;
@@ -31,12 +32,39 @@ internal static class Glob
 
     public static bool IsMatch(Type moduleType)
     {
-        if (Hexed.Length == 0)
+        var patterns = Hexed;
+
+        if (patterns.Length == 0)
         {
             return true;
         }
 
         var name = moduleType.TypeName();
-        return Hexed.Any(p => MatchesGlob(name, p));
+        var inclusions = new List<string>();
+        var exclusions = new List<string>();
+
+        foreach (var p in patterns)
+        {
+            if (p.StartsWith('!'))
+            {
+                exclusions.Add(p[1..]);
+            }
+            else
+            {
+                inclusions.Add(p);
+            }
+        }
+
+        if (exclusions.Any(e => MatchesGlob(name, e)))
+        {
+            return false;
+        }
+
+        if (inclusions.Count == 0)
+        {
+            return true;
+        }
+
+        return inclusions.Any(p => MatchesGlob(name, p));
     }
 }

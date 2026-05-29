@@ -1,9 +1,9 @@
 <Project>
   <PropertyGroup>
-    <Version>0.5.0</Version>
+    <Version>0.6.0</Version>
     <PackageReleaseNotes>
-      0.5.0
-      - Prettier class names in mermaid output.
+      0.6.0
+      - Support glob exclusions.
       0.4.0
       - Allow injection of custom WebApplication runner.
       0.3.0

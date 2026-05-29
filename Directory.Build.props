@@ -1,7 +1,9 @@
 <Project>
   <PropertyGroup>
-    <Version>0.9.0</Version>
+    <Version>0.10.0</Version>
     <PackageReleaseNotes>
+      0.10.0
+      - Add opencode agent configuration.
       0.9.0
       - Consolidated .csproj via shared props files.
       - Bumped LangVersion from 12 to 14.

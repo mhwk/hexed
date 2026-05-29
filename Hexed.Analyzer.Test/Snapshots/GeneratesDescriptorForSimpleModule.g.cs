@@ -10,21 +10,31 @@ public sealed class GeneratedDescriptor : Descriptor
     {
         if (moduleType == typeof(AppModule))
             return [typeof(OtherModule)];
+        if (moduleType == typeof(GlobbingModule))
+            return [typeof(GlobbedModule)];
+        if (moduleType == typeof(ConfiguringModule))
+            return [typeof(ModuleViaConfigure)];
         return [];
     }
 
     public IEnumerable<Type> GlobbedModules(Type moduleType)
     {
+        if (moduleType == typeof(GlobbingModule))
+            return [typeof(GlobbedModule)];
         return [];
     }
 
     public IEnumerable<Type> ConfiguredModules(Type moduleType)
     {
+        if (moduleType == typeof(ConfiguringModule))
+            return [typeof(ModuleViaConfigure)];
         return [];
     }
 
     public IEnumerable<Type> ConfiguredComponents(Type moduleType)
     {
+        if (moduleType == typeof(ConfiguringModule))
+            return [typeof(SomeComponent)];
         return [];
     }
 
@@ -32,11 +42,19 @@ public sealed class GeneratedDescriptor : Descriptor
     {
         if (moduleType == typeof(AppModule)) return new AppModule();
         if (moduleType == typeof(OtherModule)) return new OtherModule();
+        if (moduleType == typeof(GlobbingModule)) return new GlobbingModule();
+        if (moduleType == typeof(GlobbedModule)) return new GlobbedModule();
+        if (moduleType == typeof(ConfiguringModule)) return new ConfiguringModule();
+        if (moduleType == typeof(ModuleViaConfigure)) return new ModuleViaConfigure();
         throw new InvalidOperationException($"Unknown module type {moduleType}");
     }
 
     public void InvokeConfigure(object module, Type configurableType, object dependency)
     {
+        if (module is ConfiguringModule m_ConfiguringModule && configurableType == typeof(ModuleViaConfigure))
+        { ((ConfiguringModule)m_ConfiguringModule).Configure((ModuleViaConfigure)dependency); return; }
+        if (module is ConfiguringModule m_ConfiguringModule && configurableType == typeof(SomeComponent))
+        { ((ConfiguringModule)m_ConfiguringModule).Configure((SomeComponent)dependency); return; }
         throw new InvalidOperationException($"Unknown configure invocation {module.GetType()} / {configurableType}");
     }
 }

@@ -12,25 +12,19 @@ Install the package:
 dotnet add package Hexed
 ```
 
-Define a module:
+Define modules and their dependencies:
 
 ```csharp
-public sealed class MyModule : Configure<IServiceCollection>
-{
-    public void Configure(IServiceCollection services)
-    {
-        services.AddSingleton<MyService>();
-    }
-}
+public sealed class MyModule : Use<MyDependency>;
+public sealed class MyDependency : Module;
 ```
 
-Run your application:
+Load your module — dependencies are resolved and loaded automatically:
 
 ```csharp
-return await new MyModule().RunAsync(args);
+var modules = new Modules();
+modules.Load<MyModule>();
 ```
-
-When you call `RunAsync`, Hexed resolves the full dependency graph of your module — loading dependencies first, in order, before your module runs. By the time `Configure` is called on your module, everything it depends on is already in place.
 
 ## Module dependencies
 

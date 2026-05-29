@@ -9,7 +9,7 @@ using System.Threading;
 namespace Hexed.Analyzer;
 
 [Generator]
-public sealed class ModuleDescriptorGenerator : IIncrementalGenerator
+public sealed class DescriptorGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -93,7 +93,7 @@ public sealed class ModuleDescriptorGenerator : IIncrementalGenerator
         sb.AppendLine();
         sb.AppendLine("namespace Hexed;");
         sb.AppendLine();
-        sb.AppendLine("public sealed class GeneratedModuleDescriptor : ModuleDescriptor");
+        sb.AppendLine("public sealed class GeneratedDescriptor : Descriptor");
         sb.AppendLine("{");
 
         // UsedModules
@@ -219,11 +219,11 @@ public sealed class ModuleDescriptorGenerator : IIncrementalGenerator
         sb.AppendLine("    [System.Runtime.CompilerServices.ModuleInitializer]");
         sb.AppendLine("    internal static void Initialize()");
         sb.AppendLine("    {");
-        sb.AppendLine("        global::Hexed.Modules.Descriptor = new GeneratedModuleDescriptor();");
+        sb.AppendLine("        global::Hexed.Modules.Descriptor = new GeneratedDescriptor();");
         sb.AppendLine("    }");
         sb.AppendLine("}");
 
-        ctx.AddSource("GeneratedModuleDescriptor.g.cs", sb.ToString());
+        ctx.AddSource("GeneratedDescriptor.g.cs", sb.ToString());
     }
 
     private static bool IsModule(INamedTypeSymbol symbol)

@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Hexed.Analyzer.Test;
 
-public class ModuleDescriptorGeneratorTest
+public class DescriptorGeneratorTest
 {
     [Fact]
     public void GeneratesDescriptorForSimpleModule()

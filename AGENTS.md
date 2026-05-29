@@ -4,7 +4,7 @@
 
 | Project | Target | Purpose |
 |---------|--------|---------|
-| `Hexed/` | `net10.0` | Core library — `Module`, `Use<T>`, `Glob<T>`, `Configure<T>`, `Modules`, `ModuleDescriptor` |
+| `Hexed/` | `net10.0` | Core library — `Module`, `Use<T>`, `Glob<T>`, `Configure<T>`, `Modules`, `Descriptor` |
 | `Hexed.AspNetCore/` | `net10.0` | ASP.NET Core integration — `Build()`, `RunAsync()` extensions |
 | `Hexed.AspNetCore.OpenApi/` | `net10.0` | Optional OpenAPI/Scalar module |
 | `Hexed.Analyzer/` | `netstandard2.0` | Roslyn source generator (`IIncrementalGenerator`) for AOT-safe descriptor |
@@ -30,7 +30,7 @@ No special order required (no codegen step before build). The source generator r
 - **Marker-interface DI**: Dependencies declared via interface inheritance (`Use<T>`, `Glob<T>`, `Configure<T>`), not constructor injection or attributes.
 - **Two-phase resolution**: (1) Load modules & resolve `Use<T>`/`Glob<T>`/`Configure<TModule>` dependencies. (2) Push non-module components (e.g., `WebApplicationBuilder`) via `Modules.Configure(TComponent)`.
 - **Glob-based conditional loading**: `Glob<T>` loads only if type name matches `HEXED` env var (semicolon-separated glob patterns). Prepending `!` to a pattern makes it an exclusion rule — if any exclusion matches the module is not loaded. Unset `HEXED` → all globs loaded.
-- **AOT safety**: `Hexed.Analyzer` generates `GeneratedModuleDescriptor` + `[ModuleInitializer]` at compile time so runtime reflection is unnecessary. Both `Hexed` and `Hexed.AspNetCore` are `IsAotCompatible=true`.
+- **AOT safety**: `Hexed.Analyzer` generates `GeneratedDescriptor` + `[ModuleInitializer]` at compile time so runtime reflection is unnecessary. Both `Hexed` and `Hexed.AspNetCore` are `IsAotCompatible=true`.
 - **Entrypoints**: `new MyModule().RunAsync(args)` (AspNetCore), or manually `new Modules().Load(module).Configure(component)` for custom hosts.
 
 ## Code conventions (from .editorconfig)
@@ -74,5 +74,5 @@ modules.Configure<T>(T component)      // push component through Configure<T> im
 
 ## Generated code
 
-- Output: `GeneratedModuleDescriptor` (hardcoded switch-case for all descriptor methods) + `HexedInitializer` (sets `Modules.Descriptor` via `[ModuleInitializer]`).
+- Output: `GeneratedDescriptor` (hardcoded switch-case for all descriptor methods) + `HexedInitializer` (sets `Modules.Descriptor` via `[ModuleInitializer]`).
 - Generated code is not committed; it is produced at build time by `Hexed.Analyzer`.

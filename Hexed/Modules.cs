@@ -8,10 +8,10 @@ namespace Hexed;
 
 public sealed class Modules : IReadOnlyCollection<Module>
 {
-    public static ModuleDescriptor Descriptor
+    public static Descriptor Descriptor
     {
         set => field = value;
-        get => field ??= new ModuleDescriptor.Reflection();
+        get => field ??= new Descriptor.Reflection();
     }
 
     private readonly Dictionary<Type, Module> _byType = new();

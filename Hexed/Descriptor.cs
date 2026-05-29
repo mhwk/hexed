@@ -9,15 +9,15 @@ namespace Hexed;
 /// <summary>
 /// Describes module dependency and configuration relationships.
 /// </summary>
-public interface ModuleDescriptor
+public interface Descriptor
 {
     /// <summary>
     /// Returns the types this module declares as Use&lt;T&gt; dependencies.
     /// </summary>
     IEnumerable<Type> UsedModules(Type moduleType);
-    
+
     /// <summary>
-    /// Returns the types this module declares as Use&lt;T&gt; dependencies.
+    /// Returns the types this module declares as Glob&lt;T&gt; dependencies.
     /// </summary>
     IEnumerable<Type> GlobbedModules(Type moduleType);
 
@@ -29,7 +29,7 @@ public interface ModuleDescriptor
     /// <summary>
     /// Returns the component types this module declares as Configure&lt;T&gt; dependencies.
     /// </summary>
-    IEnumerable<Type> ConfiguredComponents(Type moduleType);
+    IEnumerable<Type> ConfiguredComponents(Type componentType);
 
     /// <summary>
     /// Creates a module instance by type.
@@ -43,7 +43,7 @@ public interface ModuleDescriptor
 
     [RequiresDynamicCode("Use Hexed.Analyzer for AOT compatibility.")]
     [RequiresUnreferencedCode("Use Hexed.Analyzer for AOT compatibility.")]
-    internal sealed class Reflection : ModuleDescriptor
+    internal sealed class Reflection : Descriptor
     {
         public IEnumerable<Type> UsedModules(Type moduleType)
             => GenericInterfaceArguments(moduleType, typeof(Use<>));
@@ -55,8 +55,8 @@ public interface ModuleDescriptor
             => GenericInterfaceArguments(moduleType, typeof(Configure<>))
                 .Where(t => typeof(Module).IsAssignableFrom(t));
 
-        public IEnumerable<Type> ConfiguredComponents(Type moduleType)
-            => GenericInterfaceArguments(moduleType, typeof(Configure<>))
+        public IEnumerable<Type> ConfiguredComponents(Type componentType)
+            => GenericInterfaceArguments(componentType, typeof(Configure<>))
                 .Where(t => !typeof(Module).IsAssignableFrom(t));
 
         public Module CreateModule(Type moduleType)
@@ -64,14 +64,12 @@ public interface ModuleDescriptor
                ?? throw new InvalidOperationException($"Unable to activate module {moduleType}");
 
         public void InvokeConfigure(object module, Type configurableType, object dependency)
-        {
-            var method = typeof(Configure<>)
+            => typeof(Configure<>)
                 .MakeGenericType(configurableType)
-                .GetMethod(nameof(Configure<>.Configure),
-                    BindingFlags.Instance | BindingFlags.Public)!;
-
-            method.Invoke(module, [dependency]);
-        }
+                .GetMethod(
+                    nameof(Configure<>.Configure),
+                    BindingFlags.Instance | BindingFlags.Public)!
+                .Invoke(module, [dependency]);
 
         private static IEnumerable<Type> GenericInterfaceArguments(Type type, Type openGeneric)
             => type.GetInterfaces()

@@ -1,7 +1,9 @@
 <Project>
   <PropertyGroup>
-    <Version>0.3.0</Version>
+    <Version>0.4.0</Version>
     <PackageReleaseNotes>
+      0.4.0
+      - Allow injection of custom WebApplication runner.
       0.3.0
       - Publish readme and license.
       0.2.0

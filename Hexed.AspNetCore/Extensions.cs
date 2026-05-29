@@ -1,67 +1,76 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using Hexed.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Threading.Tasks;
 
 namespace Hexed.AspNetCore;
 
 public static class Extensions
 {
-    public static WebApplication Build(this Modules modules, params string[] args)
+    extension(Module module)
     {
-        var builder = WebApplication.CreateSlimBuilder(args);
+        public WebApplication Build(params string[] args)
+        {
+            var modules = new Modules();
+            
+            modules.Load(module);
+            
+            return modules.Build(args);
+        }
 
-        modules.Configure(builder);
-        modules.Configure(builder.Configuration);
-        modules.Configure(builder.Services);
+        public Task<int> RunAsync(params string[] args)
+        {
+            var modules = new Modules();
+            
+            modules.Load(module);
+            
+            return modules.RunAsync(args);
+        }
+    }
+    
+    extension(Modules modules)
+    {
+        public WebApplication Build(params string[] args)
+        {
+            Console.WriteLine(modules.ToMermaid());
+            
+            var builder = WebApplication.CreateBuilder(args);
+            
+            modules.Configure(builder);
+            modules.Configure(builder.Configuration);
+            modules.Configure(builder.Services);
+            
+            var application = builder.Build();
+            
+            modules.Configure(application);
+            modules.Configure(application.Services);
 
-        var app = builder.Build();
+            return application;
+        }
 
-        modules.Configure(app);
-        modules.Configure(app.Services);
-
-        return app;
+        public async Task<int> RunAsync(params string[] args)
+        {
+            await using var application = modules.Build(args);
+            
+            var runner = application.Services.GetService<RunWebApplication>() ?? RunDefaultWebApplication;
+            
+            return await runner.Invoke(application, args);
+        }
     }
 
-    public static WebApplication Build(this Module module, params string[] args)
+    private static async Task<int> RunDefaultWebApplication(WebApplication app, string[] args)
     {
-        var modules = new Modules();
-
-        modules.Load(module);
-
-        return modules.Build(args);
-    }
-
-    public static async Task<int> RunAsync(this Modules modules, params string[] args)
-    {
-        await using var app = modules.Build(args);
-
-        var lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
-
         try
         {
             await app.RunAsync();
             return 0;
         }
-        catch (OperationCanceledException) when (lifetime.ApplicationStopping.IsCancellationRequested)
-        {
-            return 0;
-        }
         catch (Exception error)
         {
-            app.Logger.LogError(error, "Application crash");
+            app.Logger.LogCritical(error, "Uncaught exception");
             return -1;
         }
-    }
-
-    public static async Task<int> RunAsync(this Module module, params string[] args)
-    {
-        var modules = new Modules();
-
-        modules.Load(module);
-
-        return await modules.RunAsync(args);
     }
 }

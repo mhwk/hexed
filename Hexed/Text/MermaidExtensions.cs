@@ -9,7 +9,7 @@ public static class MermaidExtensions
 {
     extension(Modules modules)
     {
-        internal string ToMermaid()
+        public string ToMermaid()
         {
             var sb = new StringBuilder();
             sb.AppendLine("graph TD");

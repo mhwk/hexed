@@ -1,7 +1,13 @@
 <Project>
   <PropertyGroup>
-    <Version>0.8.1</Version>
+    <Version>0.9.0</Version>
     <PackageReleaseNotes>
+      0.9.0
+      - Consolidated .csproj via shared props files.
+      - Bumped LangVersion from 12 to 14.
+      - Added IsAotCompatible to Hexed.AspNetCore.OpenApi.
+      - Renamed launch profile from http to Example.
+      - Added auto-tagging GitHub workflow step.
       0.8.1
       - Fixed duplicate pattern variable in generated InvokeConfigure.
       0.8.0

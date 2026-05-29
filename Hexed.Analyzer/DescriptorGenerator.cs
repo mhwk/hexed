@@ -108,9 +108,9 @@ public sealed class DescriptorGenerator : IIncrementalGenerator
             if (used.Count == 0)
                 continue;
 
-            sb.AppendLine($"        if (moduleType == typeof({module.ToDisplayString()}))");
+            sb.AppendLine($"        if (moduleType == typeof({GlobalType(module)}))");
             sb.AppendLine(
-                $"            return [{string.Join(", ", used.Select(t => $"typeof({t.ToDisplayString()})"))}];");
+                $"            return [{string.Join(", ", used.Select(t => $"typeof({GlobalType(t)})"))}];");
         }
 
         sb.AppendLine("        return [];");
@@ -129,9 +129,9 @@ public sealed class DescriptorGenerator : IIncrementalGenerator
             if (globbed.Count == 0)
                 continue;
 
-            sb.AppendLine($"        if (moduleType == typeof({module.ToDisplayString()}))");
+            sb.AppendLine($"        if (moduleType == typeof({GlobalType(module)}))");
             sb.AppendLine(
-                $"            return [{string.Join(", ", globbed.Select(t => $"typeof({t.ToDisplayString()})"))}];");
+                $"            return [{string.Join(", ", globbed.Select(t => $"typeof({GlobalType(t)})"))}];");
         }
 
         sb.AppendLine("        return [];");
@@ -150,9 +150,9 @@ public sealed class DescriptorGenerator : IIncrementalGenerator
             if (configured.Count == 0)
                 continue;
 
-            sb.AppendLine($"        if (moduleType == typeof({module.ToDisplayString()}))");
+            sb.AppendLine($"        if (moduleType == typeof({GlobalType(module)}))");
             sb.AppendLine(
-                $"            return [{string.Join(", ", configured.Select(t => $"typeof({t.ToDisplayString()})"))}];");
+                $"            return [{string.Join(", ", configured.Select(t => $"typeof({GlobalType(t)})"))}];");
         }
 
         sb.AppendLine("        return [];");
@@ -171,9 +171,9 @@ public sealed class DescriptorGenerator : IIncrementalGenerator
             if (components.Count == 0)
                 continue;
 
-            sb.AppendLine($"        if (moduleType == typeof({module.ToDisplayString()}))");
+            sb.AppendLine($"        if (moduleType == typeof({GlobalType(module)}))");
             sb.AppendLine(
-                $"            return [{string.Join(", ", components.Select(t => $"typeof({t.ToDisplayString()})"))}];");
+                $"            return [{string.Join(", ", components.Select(t => $"typeof({GlobalType(t)})"))}];");
         }
 
         sb.AppendLine("        return [];");
@@ -186,7 +186,7 @@ public sealed class DescriptorGenerator : IIncrementalGenerator
         foreach (var module in allModules.Values)
         {
             sb.AppendLine(
-                $"        if (moduleType == typeof({module.ToDisplayString()})) return new {module.ToDisplayString()}();");
+                $"        if (moduleType == typeof({GlobalType(module)})) return new {GlobalType(module)}();");
         }
 
         sb.AppendLine("        throw new InvalidOperationException($\"Unknown module type {moduleType}\");");
@@ -203,9 +203,9 @@ public sealed class DescriptorGenerator : IIncrementalGenerator
             foreach (var configured in allConfigured)
             {
                 sb.AppendLine(
-                    $"        if (module is {module.ToDisplayString()} m_{Sanitize(module)} && configurableType == typeof({configured.ToDisplayString()}))");
+                    $"        if (module is {GlobalType(module)} m_{Sanitize(module)} && configurableType == typeof({GlobalType(configured)}))");
                 sb.AppendLine(
-                    $"        {{ (({module.ToDisplayString()})m_{Sanitize(module)}).Configure(({configured.ToDisplayString()})dependency); return; }}");
+                    $"        {{ (({GlobalType(module)})m_{Sanitize(module)}).Configure(({GlobalType(configured)})dependency); return; }}");
             }
         }
 
@@ -236,6 +236,9 @@ public sealed class DescriptorGenerator : IIncrementalGenerator
             .Where(i => i.IsGenericType && i.OriginalDefinition.ToDisplayString() == openGeneric)
             .Select(i => i.TypeArguments[0])
             .OfType<INamedTypeSymbol>();
+
+    private static string GlobalType(INamedTypeSymbol symbol) =>
+        $"global::{symbol.ToDisplayString()}";
 
     private static string Sanitize(INamedTypeSymbol symbol) =>
         symbol.ToDisplayString().Replace(".", "_").Replace("<", "_").Replace(">", "_");

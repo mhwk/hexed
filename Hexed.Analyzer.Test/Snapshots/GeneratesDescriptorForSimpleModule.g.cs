@@ -8,53 +8,53 @@ public sealed class GeneratedDescriptor : Descriptor
 {
     public IEnumerable<Type> UsedModules(Type moduleType)
     {
-        if (moduleType == typeof(AppModule))
-            return [typeof(OtherModule)];
-        if (moduleType == typeof(GlobbingModule))
-            return [typeof(GlobbedModule)];
-        if (moduleType == typeof(ConfiguringModule))
-            return [typeof(ModuleViaConfigure)];
+        if (moduleType == typeof(global::AppModule))
+            return [typeof(global::OtherModule)];
+        if (moduleType == typeof(global::GlobbingModule))
+            return [typeof(global::GlobbedModule)];
+        if (moduleType == typeof(global::ConfiguringModule))
+            return [typeof(global::ModuleViaConfigure)];
         return [];
     }
 
     public IEnumerable<Type> GlobbedModules(Type moduleType)
     {
-        if (moduleType == typeof(GlobbingModule))
-            return [typeof(GlobbedModule)];
+        if (moduleType == typeof(global::GlobbingModule))
+            return [typeof(global::GlobbedModule)];
         return [];
     }
 
     public IEnumerable<Type> ConfiguredModules(Type moduleType)
     {
-        if (moduleType == typeof(ConfiguringModule))
-            return [typeof(ModuleViaConfigure)];
+        if (moduleType == typeof(global::ConfiguringModule))
+            return [typeof(global::ModuleViaConfigure)];
         return [];
     }
 
     public IEnumerable<Type> ConfiguredComponents(Type moduleType)
     {
-        if (moduleType == typeof(ConfiguringModule))
-            return [typeof(SomeComponent)];
+        if (moduleType == typeof(global::ConfiguringModule))
+            return [typeof(global::SomeComponent)];
         return [];
     }
 
     public Module CreateModule(Type moduleType)
     {
-        if (moduleType == typeof(AppModule)) return new AppModule();
-        if (moduleType == typeof(OtherModule)) return new OtherModule();
-        if (moduleType == typeof(GlobbingModule)) return new GlobbingModule();
-        if (moduleType == typeof(GlobbedModule)) return new GlobbedModule();
-        if (moduleType == typeof(ConfiguringModule)) return new ConfiguringModule();
-        if (moduleType == typeof(ModuleViaConfigure)) return new ModuleViaConfigure();
+        if (moduleType == typeof(global::AppModule)) return new global::AppModule();
+        if (moduleType == typeof(global::OtherModule)) return new global::OtherModule();
+        if (moduleType == typeof(global::GlobbingModule)) return new global::GlobbingModule();
+        if (moduleType == typeof(global::GlobbedModule)) return new global::GlobbedModule();
+        if (moduleType == typeof(global::ConfiguringModule)) return new global::ConfiguringModule();
+        if (moduleType == typeof(global::ModuleViaConfigure)) return new global::ModuleViaConfigure();
         throw new InvalidOperationException($"Unknown module type {moduleType}");
     }
 
     public void InvokeConfigure(object module, Type configurableType, object dependency)
     {
-        if (module is ConfiguringModule m_ConfiguringModule && configurableType == typeof(ModuleViaConfigure))
-        { ((ConfiguringModule)m_ConfiguringModule).Configure((ModuleViaConfigure)dependency); return; }
-        if (module is ConfiguringModule m_ConfiguringModule && configurableType == typeof(SomeComponent))
-        { ((ConfiguringModule)m_ConfiguringModule).Configure((SomeComponent)dependency); return; }
+        if (module is global::ConfiguringModule m_ConfiguringModule && configurableType == typeof(global::ModuleViaConfigure))
+        { ((global::ConfiguringModule)m_ConfiguringModule).Configure((global::ModuleViaConfigure)dependency); return; }
+        if (module is global::ConfiguringModule m_ConfiguringModule && configurableType == typeof(global::SomeComponent))
+        { ((global::ConfiguringModule)m_ConfiguringModule).Configure((global::SomeComponent)dependency); return; }
         throw new InvalidOperationException($"Unknown configure invocation {module.GetType()} / {configurableType}");
     }
 }

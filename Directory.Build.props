@@ -1,7 +1,9 @@
 <Project>
   <PropertyGroup>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <PackageReleaseNotes>
+      0.2.0
+      - Push packages.
       0.1.0
       - Initial version.
     </PackageReleaseNotes>

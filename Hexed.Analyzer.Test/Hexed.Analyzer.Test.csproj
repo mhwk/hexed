@@ -9,4 +9,9 @@
     <ProjectReference Include="..\Hexed\Hexed.csproj"/>
     <ProjectReference Include="..\Hexed.Analyzer\Hexed.Analyzer.csproj"/>
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Snapshots/**" />
+    <None Include="Snapshots/**" />
+  </ItemGroup>
 </Project>

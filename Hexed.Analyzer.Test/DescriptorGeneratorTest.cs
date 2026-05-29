@@ -18,8 +18,6 @@ public class DescriptorGeneratorTest
         var (_, diagnostics, generatedSource) = GeneratorTestHelper.Run(source);
 
         Assert.Empty(diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
-        Assert.NotNull(generatedSource);
-        Assert.Contains("typeof(AppModule)", generatedSource);
-        Assert.Contains("typeof(OtherModule)", generatedSource);
+        Snapshot.AssertGeneratedSourceMatches(generatedSource!);
     }
 }

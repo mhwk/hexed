@@ -20,7 +20,7 @@ public static class MermaidExtensions
             {
                 var index = indices.Count;
                 indices[module.GetType()] = index;
-                sb.AppendLine($"    N{index}[\"{module.GetType().FullName}\"]");
+                sb.AppendLine($"    N{index}[\"{module.GetType().TypeName()}\"]");
             }
 
             var edges = new HashSet<string>();

@@ -8,10 +8,10 @@ namespace Hexed;
 
 public sealed class Modules : IReadOnlyCollection<Module>
 {
-    public static Descriptor Descriptor
+    public static Metadata Metadata
     {
         set => field = value;
-        get => field ??= new Descriptor.Reflection();
+        get => field ??= new Metadata.Reflection();
     }
     
     private readonly Glob _glob = new Glob();
@@ -24,7 +24,7 @@ public sealed class Modules : IReadOnlyCollection<Module>
     {
         return _byType.TryGetValue(moduleType, out var existing)
             ? existing
-            : Load(Descriptor.CreateModule(moduleType));
+            : Load(Metadata.CreateModule(moduleType));
     }
 
     public TModule Load<TModule>() where TModule : Module, new() =>
@@ -37,11 +37,11 @@ public sealed class Modules : IReadOnlyCollection<Module>
         if (_byType.TryGetValue(moduleType, out var existing))
             return (TModule)existing;
         
-        var globbedModules = Descriptor.GlobbedModules(moduleType).ToArray();
+        var globbedModules = Metadata.GlobbedModules(moduleType).ToArray();
 
-        foreach (var usedType in Descriptor.UsedModules(moduleType))
+        foreach (var usedType in Metadata.UsedModules(moduleType))
         {
-            if (Descriptor.UsedModules(usedType).Contains(moduleType))
+            if (Metadata.UsedModules(usedType).Contains(moduleType))
             {
                 throw new Exception(
                     $"Circular dependency between {moduleType.TypeName()} and {usedType.TypeName()}");
@@ -55,10 +55,10 @@ public sealed class Modules : IReadOnlyCollection<Module>
             Load(usedType);
         }
 
-        foreach (var configuredType in Descriptor.ConfiguredModules(moduleType))
+        foreach (var configuredType in Metadata.ConfiguredModules(moduleType))
         {
             var dependency = Load(configuredType);
-            Descriptor.InvokeConfigure(module, configuredType, dependency);
+            Metadata.InvokeConfigure(module, configuredType, dependency);
         }
 
         _byType[moduleType] = module;
@@ -77,7 +77,7 @@ public sealed class Modules : IReadOnlyCollection<Module>
 
         foreach (var target in _sorted.OfType<Configure<TComponent>>())
         {
-            Descriptor.InvokeConfigure(target, component.GetType(), component);
+            Metadata.InvokeConfigure(target, component.GetType(), component);
         }
 
         return this;

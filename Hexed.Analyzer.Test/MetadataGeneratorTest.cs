@@ -3,10 +3,10 @@ using System.Linq;
 
 namespace Hexed.Analyzer.Test;
 
-public class DescriptorGeneratorTest
+public class MetadataGeneratorTest
 {
     [Fact]
-    public void GeneratesDescriptorForSimpleModule()
+    public void GeneratesMetadataForSimpleModule()
     {
         var source = """
                      using Hexed;

@@ -9,7 +9,7 @@ namespace Hexed;
 /// <summary>
 /// Describes module dependency and configuration relationships.
 /// </summary>
-public interface Descriptor
+public interface Metadata
 {
     /// <summary>
     /// Returns the types this module declares as Use&lt;T&gt; dependencies.
@@ -43,7 +43,7 @@ public interface Descriptor
 
     [RequiresDynamicCode("Use Hexed.Analyzer for AOT compatibility.")]
     [RequiresUnreferencedCode("Use Hexed.Analyzer for AOT compatibility.")]
-    internal sealed class Reflection : Descriptor
+    internal sealed class Reflection : Metadata
     {
         public IEnumerable<Type> UsedModules(Type moduleType)
             => GenericInterfaceArguments(moduleType, typeof(Use<>));

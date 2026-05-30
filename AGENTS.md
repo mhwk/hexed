@@ -4,7 +4,7 @@
 
 | Project | Target | Purpose |
 |---------|--------|---------|
-| `Hexed/` | `net10.0` | Core library — `Module`, `Use<T>`, `Glob<T>`, `Configure<T>`, `Modules`, `Descriptor` |
+| `Hexed/` | `net10.0` | Core library — `Module`, `Use<T>`, `Glob<T>`, `Configure<T>`, `Modules`, `Metadata` |
 | `Hexed.AspNetCore/` | `net10.0` | ASP.NET Core integration — `Build()`, `RunAsync()` extensions |
 | `Hexed.AspNetCore.OpenApi/` | `net10.0` | Optional OpenAPI/Scalar module |
 | `Hexed.Analyzer/` | `netstandard2.0` | Roslyn source generator (`IIncrementalGenerator`) for AOT-safe descriptor |
@@ -78,5 +78,5 @@ modules.Configure<T>(T component)      // push component through Configure<T> im
 
 ## Generated code
 
-- Output: `GeneratedDescriptor` (hardcoded switch-case for all descriptor methods) + `HexedInitializer` (sets `Modules.Descriptor` via `[ModuleInitializer]`).
+- Output: `GeneratedMetadata` (hardcoded switch-case for all metadata methods) + `HexedInitializer` (sets `Modules.Metadata` via `[ModuleInitializer]`).
 - Generated code is not committed; it is produced at build time by `Hexed.Analyzer`.

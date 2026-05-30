@@ -28,8 +28,8 @@ public static class MermaidExtensions
             foreach (var module in modules)
             {
                 var fromIndex = indices[module.GetType()];
-                var deps = Modules.Descriptor.UsedModules(module.GetType())
-                    .Concat(Modules.Descriptor.ConfiguredModules(module.GetType()));
+                var deps = Modules.Metadata.UsedModules(module.GetType())
+                    .Concat(Modules.Metadata.ConfiguredModules(module.GetType()));
 
                 foreach (var depType in deps)
                 {

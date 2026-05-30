@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Hexed;
 
-public sealed class GeneratedDescriptor : Descriptor
+public sealed class GeneratedMetadata : Metadata
 {
     public IEnumerable<Type> UsedModules(Type moduleType)
     {
@@ -64,6 +64,6 @@ internal static class HexedInitializer
     [System.Runtime.CompilerServices.ModuleInitializer]
     internal static void Initialize()
     {
-        global::Hexed.Modules.Descriptor = new global::Hexed.GeneratedDescriptor();
+        global::Hexed.Modules.Metadata = new global::Hexed.GeneratedMetadata();
     }
 }

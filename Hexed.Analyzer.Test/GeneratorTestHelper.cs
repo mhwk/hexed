@@ -26,7 +26,7 @@ public static class GeneratorTestHelper
             references: references,
             options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
-        var generator = new DescriptorGenerator();
+        var generator = new MetadataGenerator();
 
         var driver = CSharpGeneratorDriver
             .Create(generator)
@@ -35,7 +35,7 @@ public static class GeneratorTestHelper
         var generatedSource = driver
             .GetRunResult()
             .GeneratedTrees
-            .FirstOrDefault(t => t.FilePath.EndsWith("GeneratedDescriptor.g.cs"))
+            .FirstOrDefault(t => t.FilePath.EndsWith("GeneratedMetadata.g.cs"))
             ?.GetText()
             .ToString();
 

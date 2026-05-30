@@ -1,4 +1,13 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".props/analyzer.props" />
+    <File Path=".props/common.props" />
+    <File Path=".props/library.props" />
+    <File Path=".props/test.props" />
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="README.md" />
+  </Folder>
   <Project Path="Example/Example.csproj" />
   <Project Path="Hexed.Analyzer.Test/Hexed.Analyzer.Test.csproj" />
   <Project Path="Hexed.Analyzer/Hexed.Analyzer.csproj" />

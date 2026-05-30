@@ -1,7 +1,12 @@
 <Project>
   <PropertyGroup>
-    <Version>0.10.0</Version>
+    <Version>0.11.0</Version>
     <PackageReleaseNotes>
+      0.11.0
+      - Hide LICENSE.txt and README.md from per-project view via Visible=false; add LICENSE.txt to .slnx
+      - Add Solution Items folder to .slnx with shared props files
+      - Cache Inclusions/Exclusions as lazy properties in Glob
+      - Make Glob non-static, Modules owns its own Glob instance
       0.10.0
       - Add opencode agent configuration.
       0.9.0

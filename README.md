@@ -1,8 +1,8 @@
 ﻿# Hexed
 
-> Become a victim of your insanity.
+> Become victim of your own insanity.
 
-Hexed is a lightweight module loader for .NET. Define your application as a collection of modules, declare what they depend on, and let Hexed wire them together in the right order.
+Hexed simply wires your dependencies together. Ward off the chaos that must come.
 
 ## Getting started
 

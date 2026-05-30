@@ -7,20 +7,13 @@ namespace Hexed;
 
 public interface Glob<TModule> : Use<TModule> where TModule : class, Module;
 
-internal static class Glob
+internal sealed class Glob
 {
-    private static string[]? _hexed;
-
-    internal static string[] Hexed => _hexed ??= (Environment.GetEnvironmentVariable("HEXED") ?? string.Empty)
+    private string[] Patterns => field ??= (Environment.GetEnvironmentVariable("HEXED") ?? string.Empty)
         .Split(';')
         .Select(glob => glob.Trim())
         .Where(glob => !string.IsNullOrWhiteSpace(glob))
         .ToArray();
-
-    internal static void ResetHexed()
-    {
-        _hexed = null;
-    }
 
     private static bool MatchesGlob(string name, string pattern)
     {
@@ -30,11 +23,9 @@ internal static class Glob
         return System.Text.RegularExpressions.Regex.IsMatch(name, regexPattern);
     }
 
-    public static bool IsMatch(Type moduleType)
+    public bool IsMatch(Type moduleType)
     {
-        var patterns = Hexed;
-
-        if (patterns.Length == 0)
+        if (Patterns.Length == 0)
         {
             return true;
         }
@@ -43,7 +34,7 @@ internal static class Glob
         var inclusions = new List<string>();
         var exclusions = new List<string>();
 
-        foreach (var p in patterns)
+        foreach (var p in Patterns)
         {
             if (p.StartsWith('!'))
             {

@@ -13,6 +13,8 @@ public sealed class Modules : IReadOnlyCollection<Module>
         set => field = value;
         get => field ??= new Descriptor.Reflection();
     }
+    
+    private readonly Glob _glob = new Glob();
 
     private readonly Dictionary<Type, Module> _byType = new();
 
@@ -45,7 +47,7 @@ public sealed class Modules : IReadOnlyCollection<Module>
                     $"Circular dependency between {moduleType.TypeName()} and {usedType.TypeName()}");
             }
 
-            if (globbedModules.Contains(usedType) && !Glob.IsMatch(usedType))
+            if (globbedModules.Contains(usedType) && !_glob.IsMatch(usedType))
             {
                 continue;
             }

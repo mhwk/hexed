@@ -10,7 +10,6 @@ public class ModulesTest
     public ModulesTest()
     {
         Environment.SetEnvironmentVariable("HEXED", null);
-        Glob.ResetHexed();
     }
 
     [Fact]

@@ -1,6 +1,5 @@
 ﻿using Hexed.Text;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Hexed;
@@ -9,11 +8,18 @@ public interface Glob<TModule> : Use<TModule> where TModule : class, Module;
 
 internal sealed class Glob
 {
-    private string[] Patterns => field ??= (Environment.GetEnvironmentVariable("HEXED") ?? string.Empty)
-        .Split(';')
-        .Select(glob => glob.Trim())
-        .Where(glob => !string.IsNullOrWhiteSpace(glob))
-        .ToArray();
+    private string[] Patterns
+        => field ??= (Environment.GetEnvironmentVariable("HEXED") ?? string.Empty)
+            .Split(';')
+            .Select(glob => glob.Trim())
+            .Where(glob => !string.IsNullOrWhiteSpace(glob))
+            .ToArray();
+
+    private string[] Inclusions
+        => field ??= Patterns.Where(p => !p.StartsWith('!')).ToArray();
+
+    private string[] Exclusions
+        => field ??= Patterns.Where(p => p.StartsWith('!')).Select(p => p[1..]).ToArray();
 
     private static bool MatchesGlob(string name, string pattern)
     {
@@ -31,31 +37,17 @@ internal sealed class Glob
         }
 
         var name = moduleType.TypeName();
-        var inclusions = new List<string>();
-        var exclusions = new List<string>();
 
-        foreach (var p in Patterns)
-        {
-            if (p.StartsWith('!'))
-            {
-                exclusions.Add(p[1..]);
-            }
-            else
-            {
-                inclusions.Add(p);
-            }
-        }
-
-        if (exclusions.Any(e => MatchesGlob(name, e)))
+        if (Exclusions.Any(e => MatchesGlob(name, e)))
         {
             return false;
         }
 
-        if (inclusions.Count == 0)
+        if (Inclusions.Length == 0)
         {
             return true;
         }
 
-        return inclusions.Any(p => MatchesGlob(name, p));
+        return Inclusions.Any(p => MatchesGlob(name, p));
     }
 }

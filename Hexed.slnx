@@ -7,6 +7,7 @@
     <File Path=".editorconfig" />
     <File Path="Directory.Build.props" />
     <File Path="README.md" />
+    <File Path="LICENSE.txt" />
   </Folder>
   <Project Path="Example/Example.csproj" />
   <Project Path="Hexed.Analyzer.Test/Hexed.Analyzer.Test.csproj" />

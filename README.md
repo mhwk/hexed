@@ -32,7 +32,7 @@ Each module defines its own dependencies. There are three ways of doing this.
 
 ### `Use<TModule>`
 
-Implement `Use<TModule>` if your module depends on the components loaded by `TModule`, and needs no further configuration.
+Implement `Use<TModule>` if your module depends on the components configured by `TModule`, and needs no further configuration.
 
 ```csharp
 public sealed class SomeModule : Use<SomeOtherModule>;

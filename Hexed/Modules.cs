@@ -10,16 +10,16 @@ public sealed class Modules : IReadOnlyCollection<Module>
 {
     public static Metadata Metadata
     {
-        set => field = value;
         get
         {
 #pragma warning disable IL2026, IL3050
             return field ??= new Metadata.Reflection();
 #pragma warning restore IL2026, IL3050
         }
+        set;
     }
 
-    private readonly Glob _glob = new Glob();
+    private readonly Glob _glob = new();
 
     private readonly Dictionary<Type, Module> _byType = new();
 
@@ -40,16 +40,18 @@ public sealed class Modules : IReadOnlyCollection<Module>
             : Load(Metadata.CreateModule(moduleType));
     }
 
-    public TModule Load<TModule>() where TModule : Module, new() =>
-        (TModule)Load(typeof(TModule));
+    public TModule Load<TModule>() where TModule : Module, new()
+        => (TModule)Load(typeof(TModule));
 
     public TModule Load<TModule>(TModule module) where TModule : Module
     {
         var moduleType = module.GetType();
 
-        if (_byType.TryGetValue(moduleType, out var existing))
+        if (_byType.TryGetValue(moduleType, out _))
+        {
             throw new HexedException.ModuleAlreadyRegistered(
                 $"Attempted to register {moduleType.TypeName()} via Load(instance) after it was already loaded. Register the instance higher up in the dependency tree, before modules that depend on it are loaded.");
+        }
 
         _resolving.Add(moduleType);
         

@@ -52,6 +52,6 @@ Check off items as they are completed.
 
 ## Housekeeping
 
-- [ ] **Remove unused `Microsoft.Extensions.Configuration` and `Microsoft.Extensions.DependencyInjection` package references** from `Hexed/Hexed.csproj:9-10` (they are never used in source code).
+- [x] **Remove unused `Microsoft.Extensions.Configuration` and `Microsoft.Extensions.DependencyInjection` package references** from `Hexed/Hexed.csproj:9-10` (they are never used in source code).
 - [ ] **Fix inconsistent `using` style** in `Hexed/Exception.cs:3` — uses `System.Exception` instead of `using System;`.
 - [ ] **Add `CancellationToken` checks** in `Hexed.Analyzer/MetadataGenerator.cs` — `Execute()` never checks `ctx.CancellationToken`.

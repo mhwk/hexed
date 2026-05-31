@@ -1,6 +1,8 @@
-﻿namespace Hexed;
+﻿using System;
 
-public abstract class HexedException : System.Exception
+namespace Hexed;
+
+public abstract class HexedException : Exception
 {
     private HexedException(string? message) : base(message)
     {

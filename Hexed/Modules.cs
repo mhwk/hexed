@@ -11,7 +11,12 @@ public sealed class Modules : IReadOnlyCollection<Module>
     public static Metadata Metadata
     {
         set => field = value;
-        get => field ??= new Metadata.Reflection();
+        get
+        {
+#pragma warning disable IL2026, IL3050
+            return field ??= new Metadata.Reflection();
+#pragma warning restore IL2026, IL3050
+        }
     }
     
     private readonly Glob _glob = new Glob();

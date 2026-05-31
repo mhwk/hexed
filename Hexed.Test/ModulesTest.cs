@@ -260,10 +260,22 @@ public class ModulesTest
     public void ConfiguresViaInterface()
     {
         var modules = new Modules();
-        modules.Load<ModuleWithConcrete>();
+        modules.Load<ModuleWithConfigurableInterface>();
 
         var configurator = new ConcreteConfigurable();
         modules.Configure<IConfigurable>(configurator);
+
+        configurator.Configured.Should().BeTrue();
+    }
+
+    [Fact]
+    public void ConfiguresViaConcreteType()
+    {
+        var modules = new Modules();
+        modules.Load<ModuleWithConfigurableConcrete>();
+
+        var configurator = new ConcreteConfigurable();
+        modules.Configure(configurator);
 
         configurator.Configured.Should().BeTrue();
     }
@@ -364,11 +376,19 @@ public class ModulesTest
         public bool Configured { get; set; }
     }
 
-    private sealed class ModuleWithConcrete : Configure<IConfigurable>
+    private sealed class ModuleWithConfigurableInterface : Configure<IConfigurable>
     {
         public void Configure(IConfigurable component)
         {
             ((ConcreteConfigurable)component).Configured = true;
+        }
+    }
+
+    private sealed class ModuleWithConfigurableConcrete : Configure<ConcreteConfigurable>
+    {
+        public void Configure(ConcreteConfigurable component)
+        {
+            component.Configured = true;
         }
     }
 

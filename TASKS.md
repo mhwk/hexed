@@ -8,8 +8,8 @@ Check off items as they are completed.
 
 - [x] **Source generator emits invalid C# for open generic module definitions** (`Hexed.Analyzer/MetadataGenerator.cs:35-36`) — Open generic definitions (`SomeGeneric<T>`) pass `GetModuleType` and get emitted as invalid `typeof(SomeGeneric<T>)`. Fixed by filtering out `IsGenericType && IsDefinition` in `GetModuleType`.
 - [x] **`InvokeConfigure` NRE on missing public method, and wrapped exceptions** (`Hexed/Metadata.cs:66-79`) — Replaced `!` null-forgiving with proper null check and `HexedException.UnknownConfigureInvocation`. Added try/catch to unwrap `TargetInvocationException` via `ExceptionDispatchInfo` preserving original stack trace.
-- [ ] **`InvalidCastException` in test helper** (`Hexed.Test/ModulesTest.cs:357-359`) — `ModuleWithConcrete.Configure(IConfigurable)` unconditionally casts to `ConcreteConfigurable`.
-- [ ] **`HexedException` inner exceptions lost** (`Hexed/Exception.cs:13-25`) — None of the nested exception types expose the `(string?, Exception?)` constructor from the base class.
+- [x] **`InvalidCastException` in test helper** — Renamed `ModuleWithConcrete` → `ModuleWithInterface`. Added `ModuleWithConcreteDirect` + `ConfiguresViaConcreteType` test for cast-free concrete type configuration.
+- [x] **`HexedException` inner exceptions lost** (`Hexed/Exception.cs:13-25`) — None of the nested exception types expose the `(string?, Exception?)` constructor from the base class.
 - [ ] **Unused exception types** (`Hexed/Exception.cs:21,23`) — `UnknownModule` and `UnknownConfigureInvocation` are defined but never thrown outside generated code.
 
 ## Design Issues

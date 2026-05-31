@@ -19,9 +19,12 @@ public sealed class MetadataGenerator : IIncrementalGenerator
                 transform: static (ctx, ct) => GetModuleType(ctx, ct))
             .Where(static t => t is not null);
 
+        var compilationAndModules = moduleTypes.Collect()
+            .Combine(context.CompilationProvider);
+
         context.RegisterSourceOutput(
-            moduleTypes.Collect(),
-            static (ctx, modules) => Execute(ctx, modules));
+            compilationAndModules,
+            static (ctx, tuple) => Execute(ctx, tuple.Left, tuple.Right));
     }
 
     private static INamedTypeSymbol? GetModuleType(GeneratorSyntaxContext ctx, CancellationToken ct)
@@ -32,7 +35,12 @@ public sealed class MetadataGenerator : IIncrementalGenerator
         if (symbol is null || symbol.IsAbstract)
             return null;
 
-        if (IsModule(symbol))
+        var moduleType = ctx.SemanticModel.Compilation.GetTypeByMetadataName("Hexed.Module");
+
+        if (moduleType is null)
+            return null;
+
+        if (IsModule(symbol, moduleType))
         {
             return symbol;
         }
@@ -41,7 +49,7 @@ public sealed class MetadataGenerator : IIncrementalGenerator
     }
 
     private static void Execute(SourceProductionContext ctx,
-        ImmutableArray<INamedTypeSymbol?> moduleSymbols)
+        ImmutableArray<INamedTypeSymbol?> moduleSymbols, Compilation compilation)
     {
         var entryModules = moduleSymbols
             .Where(m => m is not null)
@@ -51,28 +59,37 @@ public sealed class MetadataGenerator : IIncrementalGenerator
         if (entryModules.Count == 0)
             return;
 
+        var moduleType = compilation.GetTypeByMetadataName("Hexed.Module");
+        var useType = compilation.GetTypeByMetadataName("Hexed.Use`1");
+        var globType = compilation.GetTypeByMetadataName("Hexed.Glob`1");
+        var configureType = compilation.GetTypeByMetadataName("Hexed.Configure`1");
+
+        if (moduleType is null || useType is null || globType is null || configureType is null)
+            return;
+
         // transitively discover all reachable module types
-        var allModules = new Dictionary<string, INamedTypeSymbol>();
+        var allModules = new Dictionary<INamedTypeSymbol, INamedTypeSymbol>(SymbolEqualityComparer.Default);
         var queue = new Queue<INamedTypeSymbol>(entryModules);
 
         while (queue.Count > 0)
         {
             var module = queue.Dequeue();
-            var key = module.ToDisplayString();
 
-            if (allModules.ContainsKey(key))
+            if (allModules.ContainsKey(module))
                 continue;
 
-            allModules[key] = module;
+            allModules[module] = module;
 
             foreach (var iface in module.AllInterfaces)
             {
                 if (!iface.IsGenericType)
                     continue;
 
-                var definition = iface.OriginalDefinition.ToDisplayString();
+                var definition = iface.OriginalDefinition;
 
-                if (definition is not ("Hexed.Use<TModule>" or "Hexed.Glob<TModule>" or "Hexed.Configure<TComponent>"))
+                if (!SymbolEqualityComparer.Default.Equals(definition, useType) &&
+                    !SymbolEqualityComparer.Default.Equals(definition, globType) &&
+                    !SymbolEqualityComparer.Default.Equals(definition, configureType))
                     continue;
 
                 var argument = iface.TypeArguments[0] as INamedTypeSymbol;
@@ -80,7 +97,7 @@ public sealed class MetadataGenerator : IIncrementalGenerator
                 if (argument is null)
                     continue;
 
-                if (IsModule(argument) && !allModules.ContainsKey(argument.ToDisplayString()))
+                if (IsModule(argument, moduleType) && !allModules.ContainsKey(argument))
                     queue.Enqueue(argument);
             }
         }
@@ -101,8 +118,8 @@ public sealed class MetadataGenerator : IIncrementalGenerator
         sb.AppendLine("    {");
         foreach (var module in allModules.Values)
         {
-            var used = GetInterfaceArguments(module, "Hexed.Use<TModule>")
-                .Where(IsModule)
+            var used = GetInterfaceArguments(module, useType)
+                .Where(t => IsModule(t, moduleType))
                 .ToList();
 
             if (used.Count == 0)
@@ -122,8 +139,8 @@ public sealed class MetadataGenerator : IIncrementalGenerator
         sb.AppendLine("    {");
         foreach (var module in allModules.Values)
         {
-            var globbed = GetInterfaceArguments(module, "Hexed.Glob<TModule>")
-                .Where(IsModule)
+            var globbed = GetInterfaceArguments(module, globType)
+                .Where(t => IsModule(t, moduleType))
                 .ToList();
 
             if (globbed.Count == 0)
@@ -143,8 +160,8 @@ public sealed class MetadataGenerator : IIncrementalGenerator
         sb.AppendLine("    {");
         foreach (var module in allModules.Values)
         {
-            var configured = GetInterfaceArguments(module, "Hexed.Configure<TComponent>")
-                .Where(IsModule)
+            var configured = GetInterfaceArguments(module, configureType)
+                .Where(t => IsModule(t, moduleType))
                 .ToList();
 
             if (configured.Count == 0)
@@ -164,8 +181,8 @@ public sealed class MetadataGenerator : IIncrementalGenerator
         sb.AppendLine("    {");
         foreach (var module in allModules.Values)
         {
-            var components = GetInterfaceArguments(module, "Hexed.Configure<TComponent>")
-                .Where(t => !IsModule(t))
+            var components = GetInterfaceArguments(module, configureType)
+                .Where(t => !IsModule(t, moduleType))
                 .ToList();
 
             if (components.Count == 0)
@@ -198,7 +215,7 @@ public sealed class MetadataGenerator : IIncrementalGenerator
         sb.AppendLine("    {");
         foreach (var module in allModules.Values)
         {
-            var allConfigured = GetInterfaceArguments(module, "Hexed.Configure<TComponent>").ToList();
+            var allConfigured = GetInterfaceArguments(module, configureType).ToList();
 
             foreach (var configured in allConfigured)
             {
@@ -226,14 +243,14 @@ public sealed class MetadataGenerator : IIncrementalGenerator
         ctx.AddSource("GeneratedMetadata.g.cs", sb.ToString());
     }
 
-    private static bool IsModule(INamedTypeSymbol symbol)
+    private static bool IsModule(INamedTypeSymbol symbol, INamedTypeSymbol moduleType)
     {
-        return symbol.AllInterfaces.Any(i => i.ToDisplayString() == "Hexed.Module");
+        return symbol.AllInterfaces.Any(i => SymbolEqualityComparer.Default.Equals(i, moduleType));
     }
 
-    private static IEnumerable<INamedTypeSymbol> GetInterfaceArguments(INamedTypeSymbol symbol, string openGeneric) =>
+    private static IEnumerable<INamedTypeSymbol> GetInterfaceArguments(INamedTypeSymbol symbol, INamedTypeSymbol openGenericType) =>
         symbol.AllInterfaces
-            .Where(i => i.IsGenericType && i.OriginalDefinition.ToDisplayString() == openGeneric)
+            .Where(i => i.IsGenericType && SymbolEqualityComparer.Default.Equals(i.OriginalDefinition, openGenericType))
             .Select(i => i.TypeArguments[0])
             .OfType<INamedTypeSymbol>();
 

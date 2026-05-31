@@ -5,16 +5,26 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>0.12.0</Version>
+    <Version>0.13.0</Version>
     <PackageReleaseNotes>
-      0.12.0
-      - Replace generic Exception with typed exception hierarchy
-      - Throw on Load(instance) after module is already registered
-      - Add tests covering remaining Modules code paths
-      - Enable centralized package version management via Directory.Packages.props
-      - Rename Descriptor to Metadata
-      - Fix typo in readme
-      - Improved readme
+       0.13.0
+       - Filter open generic module definitions in source generator
+       - Fix InvokeConfigure NRE and unwrap TargetInvocationException
+       - Remove O(N²) reflection-based circular dependency check
+       - Remove unused Microsoft.Extensions.Configuration/DependencyInjection package references
+       - Rename ModuleWithConcrete test module; add ConfiguresViaConcreteType test
+       - Add Hexed.AspNetCore.Test project with Extensions tests
+       - Validate Glob/Use and Configure type argument incompatibility
+       - Fix deep circular dependency detection
+       - Suppress AOT warnings for intentional reflection fallback
+       - Enable Native AOT publishing for Example project
+       0.12.0
+       - Replace generic Exception with typed exception hierarchy
+       - Throw on Load(instance) after module is already registered
+       - Add tests covering remaining Modules code paths
+       - Enable centralized package version management via Directory.Packages.props
+       - Rename Descriptor to Metadata
+       - Improved readme
       0.11.0
       - Hide LICENSE.txt and README.md from per-project view via Visible=false; add LICENSE.txt to .slnx
       - Add Solution Items folder to .slnx with shared props files

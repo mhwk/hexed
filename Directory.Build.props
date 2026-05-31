@@ -5,8 +5,16 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>0.11.0</Version>
+    <Version>0.12.0</Version>
     <PackageReleaseNotes>
+      0.12.0
+      - Replace generic Exception with typed exception hierarchy
+      - Throw on Load(instance) after module is already registered
+      - Add tests covering remaining Modules code paths
+      - Enable centralized package version management via Directory.Packages.props
+      - Rename Descriptor to Metadata
+      - Fix typo in readme
+      - Improved readme
       0.11.0
       - Hide LICENSE.txt and README.md from per-project view via Visible=false; add LICENSE.txt to .slnx
       - Add Solution Items folder to .slnx with shared props files

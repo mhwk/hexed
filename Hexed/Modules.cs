@@ -18,15 +18,23 @@ public sealed class Modules : IReadOnlyCollection<Module>
 #pragma warning restore IL2026, IL3050
         }
     }
-    
+
     private readonly Glob _glob = new Glob();
 
     private readonly Dictionary<Type, Module> _byType = new();
 
     private readonly List<Module> _sorted = new();
 
+    private readonly HashSet<Type> _resolving = new();
+
     private Module Load(Type moduleType)
     {
+        if (_resolving.Contains(moduleType))
+        {
+            throw new Exception.CircularDependency(
+                $"Circular dependency detected involving {moduleType.TypeName()}");
+        }
+
         return _byType.TryGetValue(moduleType, out var existing)
             ? existing
             : Load(Metadata.CreateModule(moduleType));
@@ -42,33 +50,42 @@ public sealed class Modules : IReadOnlyCollection<Module>
         if (_byType.TryGetValue(moduleType, out var existing))
             throw new Exception.ModuleAlreadyRegistered(
                 $"Attempted to register {moduleType.TypeName()} via Load(instance) after it was already loaded. Register the instance higher up in the dependency tree, before modules that depend on it are loaded.");
+
+        _resolving.Add(moduleType);
         
-        var globbedModules = Metadata.GlobbedModules(moduleType).ToArray();
-
-        foreach (var usedType in Metadata.UsedModules(moduleType))
+        try
         {
-            if (Metadata.UsedModules(usedType).Contains(moduleType))
+            var globbedModules = Metadata.GlobbedModules(moduleType).ToArray();
+
+            foreach (var usedType in Metadata.UsedModules(moduleType))
             {
-                throw new Exception.CircularDependency(
-                    $"Circular dependency between {moduleType.TypeName()} and {usedType.TypeName()}");
+                if (Metadata.UsedModules(usedType).Contains(moduleType))
+                {
+                    throw new Exception.CircularDependency(
+                        $"Circular dependency between {moduleType.TypeName()} and {usedType.TypeName()}");
+                }
+
+                if (globbedModules.Contains(usedType) && !_glob.IsMatch(usedType))
+                {
+                    continue;
+                }
+
+                Load(usedType);
             }
 
-            if (globbedModules.Contains(usedType) && !_glob.IsMatch(usedType))
+            foreach (var configuredType in Metadata.ConfiguredModules(moduleType))
             {
-                continue;
+                var dependency = Load(configuredType);
+                Metadata.InvokeConfigure(module, configuredType, dependency);
             }
 
-            Load(usedType);
+            _byType[moduleType] = module;
+            _sorted.Add(module);
         }
-
-        foreach (var configuredType in Metadata.ConfiguredModules(moduleType))
+        finally
         {
-            var dependency = Load(configuredType);
-            Metadata.InvokeConfigure(module, configuredType, dependency);
+            _resolving.Remove(moduleType);
         }
-
-        _byType[moduleType] = module;
-        _sorted.Add(module);
 
         return module;
     }

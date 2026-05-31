@@ -222,6 +222,17 @@ public class ModulesTest
         configure.Should().NotThrow();
     }
 
+    [Fact]
+    public void DeepCircularUseThrowsException()
+    {
+        var modules = new Modules();
+
+        var load = () => modules.Load<DeepCircularA>();
+
+        load.Should().Throw<Exception.CircularDependency>()
+            .WithMessage($"Circular dependency detected involving {typeof(DeepCircularA).TypeName()}");
+    }
+
     private sealed class ModuleA : Module;
 
     private sealed class ModuleB : Use<ModuleA>
@@ -275,4 +286,10 @@ public class ModulesTest
     private sealed class Globbing : Glob<Globbed>;
 
     private sealed class Globbed : Module;
+
+    private sealed class DeepCircularA : Use<DeepCircularB>;
+
+    private sealed class DeepCircularB : Use<DeepCircularC>;
+
+    private sealed class DeepCircularC : Use<DeepCircularA>;
 }

@@ -5,39 +5,42 @@ namespace Hexed;
 
 public sealed class GeneratedMetadata : Metadata
 {
+    private static readonly Type[] s_AppModule_used = [typeof(global::OtherModule)];
+    private static readonly Type[] s_GlobbingModule_used = [typeof(global::GlobbedModule)];
+    private static readonly Type[] s_ConfiguringModule_used = [typeof(global::ModuleViaConfigure)];
+    private static readonly Type[] s_ModuleUsingNested_used = [typeof(global::Container.NestedModule)];
+    private static readonly Type[] s_AnotherModule_used = [typeof(global::SomeGeneric<int>)];
+    private static readonly Type[] s_MyApp_ModuleUsingNamespace_used = [typeof(global::MyApp.NamespacedModule)];
+    private static readonly Type[] s_GlobbingModule_globbed = [typeof(global::GlobbedModule)];
+    private static readonly Type[] s_ConfiguringModule_configured = [typeof(global::ModuleViaConfigure)];
+    private static readonly Type[] s_ConfiguringModule_components = [typeof(global::SomeComponent)];
+
     public Type[] UsedModules(Type moduleType)
     {
-        if (moduleType == typeof(global::AppModule))
-            return [typeof(global::OtherModule)];
-        if (moduleType == typeof(global::GlobbingModule))
-            return [typeof(global::GlobbedModule)];
-        if (moduleType == typeof(global::ConfiguringModule))
-            return [typeof(global::ModuleViaConfigure)];
-        if (moduleType == typeof(global::ModuleUsingNested))
-            return [typeof(global::Container.NestedModule)];
-        if (moduleType == typeof(global::AnotherModule))
-            return [typeof(global::SomeGeneric<int>)];
+        if (moduleType == typeof(global::AppModule)) return s_AppModule_used;
+        if (moduleType == typeof(global::GlobbingModule)) return s_GlobbingModule_used;
+        if (moduleType == typeof(global::ConfiguringModule)) return s_ConfiguringModule_used;
+        if (moduleType == typeof(global::ModuleUsingNested)) return s_ModuleUsingNested_used;
+        if (moduleType == typeof(global::AnotherModule)) return s_AnotherModule_used;
+        if (moduleType == typeof(global::MyApp.ModuleUsingNamespace)) return s_MyApp_ModuleUsingNamespace_used;
         return [];
     }
 
     public Type[] GlobbedModules(Type moduleType)
     {
-        if (moduleType == typeof(global::GlobbingModule))
-            return [typeof(global::GlobbedModule)];
+        if (moduleType == typeof(global::GlobbingModule)) return s_GlobbingModule_globbed;
         return [];
     }
 
     public Type[] ConfiguredModules(Type moduleType)
     {
-        if (moduleType == typeof(global::ConfiguringModule))
-            return [typeof(global::ModuleViaConfigure)];
+        if (moduleType == typeof(global::ConfiguringModule)) return s_ConfiguringModule_configured;
         return [];
     }
 
     public Type[] ConfiguredComponents(Type moduleType)
     {
-        if (moduleType == typeof(global::ConfiguringModule))
-            return [typeof(global::SomeComponent)];
+        if (moduleType == typeof(global::ConfiguringModule)) return s_ConfiguringModule_components;
         return [];
     }
 
@@ -52,6 +55,8 @@ public sealed class GeneratedMetadata : Metadata
         if (moduleType == typeof(global::Container.NestedModule)) return new global::Container.NestedModule();
         if (moduleType == typeof(global::ModuleUsingNested)) return new global::ModuleUsingNested();
         if (moduleType == typeof(global::AnotherModule)) return new global::AnotherModule();
+        if (moduleType == typeof(global::MyApp.NamespacedModule)) return new global::MyApp.NamespacedModule();
+        if (moduleType == typeof(global::MyApp.ModuleUsingNamespace)) return new global::MyApp.ModuleUsingNamespace();
         if (moduleType == typeof(global::SomeGeneric<int>)) return new global::SomeGeneric<int>();
         throw new global::Hexed.HexedException.UnknownModule($"Unknown module type {moduleType}");
     }

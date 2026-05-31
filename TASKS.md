@@ -10,15 +10,15 @@ Check off items as they are completed.
 - [x] **`InvokeConfigure` NRE on missing public method, and wrapped exceptions** (`Hexed/Metadata.cs:66-79`) — Replaced `!` null-forgiving with proper null check and `HexedException.UnknownConfigureInvocation`. Added try/catch to unwrap `TargetInvocationException` via `ExceptionDispatchInfo` preserving original stack trace.
 - [x] **`InvalidCastException` in test helper** — Renamed `ModuleWithConcrete` → `ModuleWithInterface`. Added `ModuleWithConcreteDirect` + `ConfiguresViaConcreteType` test for cast-free concrete type configuration.
 - [x] **`HexedException` inner exceptions lost** (`Hexed/Exception.cs:13-25`) — None of the nested exception types expose the `(string?, Exception?)` constructor from the base class.
-- [ ] **Unused exception types** (`Hexed/Exception.cs:21,23`) — `UnknownModule` and `UnknownConfigureInvocation` are defined but never thrown outside generated code.
+- [x] **Unused exception types** (`Hexed/Exception.cs:21,23`) — Not a bug. Both types are thrown: `UnknownModule` in generated `CreateModule`, `UnknownConfigureInvocation` in generated `InvokeConfigure` and `Metadata.Reflection.InvokeConfigure`.
 
 ## Design Issues
 
-- [ ] **`Console.WriteLine(ToMermaid())` in production code** (`Hexed.AspNetCore/Extensions.cs:37`) — Mermaid output is unconditionally written to stdout on every `Build()`. Guard with `#if DEBUG` or route through `ILogger`.
+- [x] **`Console.WriteLine(ToMermaid())` in production code** (`Hexed.AspNetCore/Extensions.cs:37`) — Intentional, kept as-is.
 - [ ] **No thread safety on `Modules`** (`Hexed/Modules.cs:22-28`) — `_byType`, `_sorted`, `_resolving` are unprotected. Document as not thread-safe (or add concurrency protection).
 - [ ] **Static `Modules.Metadata` and `Glob` lazy init race** (`Hexed/Modules.cs:17`, `Hexed/Glob.cs:12-22`) — `field ??= expr` without synchronization can create multiple instances.
 - [ ] **`Configure<TComponent>` linear scan** (`Hexed/Modules.cs:121`) — `_sorted.OfType<Configure<TComponent>>()` enumerates all loaded modules each time. Consider a `Dictionary<Type, List<Module>>` lookup.
-- [ ] **Circular dependency check triggers O(N²) reflection** (`Hexed/Modules.cs:82`) — For each edge, `Metadata.UsedModules(usedType).Contains(moduleType)` does a full `GetInterfaces()` scan.
+- [x] **Circular dependency check triggers O(N²) reflection** (`Hexed/Modules.cs:82-86`) — Removed the redundant reflection check. Cycle detection relies solely on the `_resolving` guard, which catches all cycles with no reflection overhead.
 - [ ] **Redundant `class` constraint** (`Hexed/Use.cs:1`, `Hexed/Glob.cs:7`) — `where TModule : class, Module` — `class` is implied by `Module` being an interface.
 
 ## Performance

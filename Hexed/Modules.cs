@@ -79,12 +79,6 @@ public sealed class Modules : IReadOnlyCollection<Module>
 
             foreach (var usedType in usedModules)
             {
-                if (Metadata.UsedModules(usedType).Contains(moduleType))
-                {
-                    throw new HexedException.CircularDependency(
-                        $"Circular dependency between {moduleType.TypeName()} and {usedType.TypeName()}");
-                }
-
                 if (globbedModules.Contains(usedType) && !_glob.IsMatch(usedType))
                 {
                     continue;

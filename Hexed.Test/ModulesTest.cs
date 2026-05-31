@@ -73,9 +73,9 @@ public class ModulesTest
         var b = () => modules.Load<CircularUseB>();
 
         a.Should().Throw<HexedException.CircularDependency>()
-            .WithMessage($"Circular dependency between {typeof(CircularUseA).TypeName()} and {typeof(CircularUseB).TypeName()}");
+            .WithMessage($"Circular dependency detected involving {typeof(CircularUseA).TypeName()}");
         b.Should().Throw<HexedException.CircularDependency>()
-            .WithMessage($"Circular dependency between {typeof(CircularUseB).TypeName()} and {typeof(CircularUseA).TypeName()}");
+            .WithMessage($"Circular dependency detected involving {typeof(CircularUseB).TypeName()}");
     }
 
     [Fact]
@@ -87,11 +87,9 @@ public class ModulesTest
         var b = () => modules.Load<CircularConfigureB>();
 
         a.Should().Throw<HexedException.CircularDependency>()
-            .WithMessage(
-                $"Circular dependency between {typeof(CircularConfigureA).TypeName()} and {typeof(CircularConfigureB).TypeName()}");
+            .WithMessage($"Circular dependency detected involving {typeof(CircularConfigureA).TypeName()}");
         b.Should().Throw<HexedException.CircularDependency>()
-            .WithMessage(
-                $"Circular dependency between {typeof(CircularConfigureB).TypeName()} and {typeof(CircularConfigureA).TypeName()}");
+            .WithMessage($"Circular dependency detected involving {typeof(CircularConfigureB).TypeName()}");
     }
 
     [Theory]

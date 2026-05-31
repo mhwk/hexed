@@ -57,27 +57,10 @@ public sealed class Modules : IReadOnlyCollection<Module>
         
         try
         {
+            Metadata.AssertValidModule(moduleType);
+
             var globbedModules = Metadata.GlobbedModules(moduleType);
             var usedModules = Metadata.UsedModules(moduleType);
-            var configuredTypes = Metadata.ConfiguredModules(moduleType)
-                .Concat(Metadata.ConfiguredComponents(moduleType))
-                .ToArray();
-
-            var globConfigureConflict = globbedModules.Intersect(configuredTypes).ToArray();
-
-            if (globConfigureConflict.Length > 0)
-            {
-                throw new HexedException.InvalidModuleDeclaration(
-                    $"{moduleType.TypeName()} declares both Glob<{globConfigureConflict[0].TypeName()}> and Configure<{globConfigureConflict[0].TypeName()}>, which are incompatible.");
-            }
-
-            var useConfigureConflict = usedModules.Intersect(configuredTypes).ToArray();
-
-            if (useConfigureConflict.Length > 0)
-            {
-                throw new HexedException.InvalidModuleDeclaration(
-                    $"{moduleType.TypeName()} declares both Use<{useConfigureConflict[0].TypeName()}> and Configure<{useConfigureConflict[0].TypeName()}>, which are incompatible.");
-            }
 
             foreach (var usedType in usedModules)
             {

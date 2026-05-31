@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hexed.Text;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -42,6 +43,48 @@ public interface Metadata
     /// Invokes Configure&lt;T&gt;.Configure(dependency) on the given module instance.
     /// </summary>
     void InvokeConfigure(object module, Type configurableType, object dependency);
+
+    /// <summary>
+    /// Validates that the module's dependency declarations are consistent.
+    /// Throws <see cref="HexedException.InvalidModuleDeclaration"/> on conflict.
+    /// </summary>
+    void AssertValidModule(Type moduleType)
+    {
+        static void ThrowConflict(Type mt, string kind, Type ct)
+        {
+            throw new HexedException.InvalidModuleDeclaration(
+                $"{mt.TypeName()} declares both {kind}<{ct.TypeName()}> and Configure<{ct.TypeName()}>, which are incompatible.");
+        }
+
+        var globbed = GlobbedModules(moduleType);
+        var used = UsedModules(moduleType);
+
+        foreach (var t in ConfiguredModules(moduleType))
+        {
+            if (Array.IndexOf(globbed, t) >= 0)
+            {
+                ThrowConflict(moduleType, "Glob", t);
+            }
+
+            if (Array.IndexOf(used, t) >= 0)
+            {
+                ThrowConflict(moduleType, "Use", t);
+            }
+        }
+
+        foreach (var t in ConfiguredComponents(moduleType))
+        {
+            if (Array.IndexOf(globbed, t) >= 0)
+            {
+                ThrowConflict(moduleType, "Glob", t);
+            }
+
+            if (Array.IndexOf(used, t) >= 0)
+            {
+                ThrowConflict(moduleType, "Use", t);
+            }
+        }
+    }
 
     [RequiresDynamicCode("Use Hexed.Analyzer for AOT compatibility.")]
     [RequiresUnreferencedCode("Use Hexed.Analyzer for AOT compatibility.")]

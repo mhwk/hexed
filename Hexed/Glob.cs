@@ -21,12 +21,45 @@ internal sealed class Glob
     private string[] Exclusions
         => field ??= Patterns.Where(p => p.StartsWith('!')).Select(p => p[1..]).ToArray();
 
-    private static bool MatchesGlob(string name, string pattern)
+    private static bool MatchesGlob(string name, ReadOnlySpan<char> pattern)
     {
-        var regexPattern = "^" + System.Text.RegularExpressions.Regex.Escape(pattern)
-            .Replace("\\*", ".*")
-            .Replace("\\?", ".") + "$";
-        return System.Text.RegularExpressions.Regex.IsMatch(name, regexPattern);
+        var nameSpan = name.AsSpan();
+        var ni = 0;
+        var pi = 0;
+        var lastStar = -1;
+        var lastMatch = 0;
+
+        while (ni < nameSpan.Length)
+        {
+            if (pi < pattern.Length && (pattern[pi] == '?' || pattern[pi] == nameSpan[ni]))
+            {
+                ni++;
+                pi++;
+            }
+            else if (pi < pattern.Length && pattern[pi] == '*')
+            {
+                lastStar = pi;
+                lastMatch = ni;
+                pi++;
+            }
+            else if (lastStar >= 0)
+            {
+                pi = lastStar + 1;
+                lastMatch++;
+                ni = lastMatch;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        while (pi < pattern.Length && pattern[pi] == '*')
+        {
+            pi++;
+        }
+
+        return pi == pattern.Length;
     }
 
     public bool IsMatch(Type moduleType)

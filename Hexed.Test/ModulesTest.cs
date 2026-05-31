@@ -256,6 +256,28 @@ public class ModulesTest
         configurator.Configured.Should().BeTrue();
     }
 
+    [Fact]
+    public void GlobAndConfigureOnSameTypeThrows()
+    {
+        var modules = new Modules();
+
+        var load = () => modules.Load<GlobAndConfigureConflict>();
+
+        load.Should().Throw<Exception.InvalidModuleDeclaration>()
+            .WithMessage($"*Glob<{typeof(ModuleForConflict).TypeName()}>*");
+    }
+
+    [Fact]
+    public void UseAndConfigureOnSameTypeThrows()
+    {
+        var modules = new Modules();
+
+        var load = () => modules.Load<UseAndConfigureConflict>();
+
+        load.Should().Throw<Exception.InvalidModuleDeclaration>()
+            .WithMessage($"*Use<{typeof(ModuleForConflict).TypeName()}>*");
+    }
+
     private sealed class ModuleA : Module;
 
     private sealed class ModuleB : Use<ModuleA>
@@ -335,6 +357,22 @@ public class ModulesTest
         public void Configure(IConfigurable component)
         {
             ((ConcreteConfigurable)component).Configured = true;
+        }
+    }
+
+    private sealed class ModuleForConflict : Module;
+
+    private sealed class GlobAndConfigureConflict : Glob<ModuleForConflict>, Configure<ModuleForConflict>
+    {
+        public void Configure(ModuleForConflict component)
+        {
+        }
+    }
+
+    private sealed class UseAndConfigureConflict : Use<ModuleForConflict>, Configure<ModuleForConflict>
+    {
+        public void Configure(ModuleForConflict component)
+        {
         }
     }
 }

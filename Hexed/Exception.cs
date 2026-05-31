@@ -21,4 +21,6 @@ public abstract class Exception : System.Exception
     public sealed class UnknownModule(string? message) : Exception(message);
 
     public sealed class UnknownConfigureInvocation(string? message) : Exception(message);
+
+    public sealed class InvalidModuleDeclaration(string? message) : Exception(message);
 }

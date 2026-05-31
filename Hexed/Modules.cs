@@ -31,7 +31,7 @@ public sealed class Modules : IReadOnlyCollection<Module>
     {
         if (_resolving.Contains(moduleType))
         {
-            throw new Exception.CircularDependency(
+            throw new HexedException.CircularDependency(
                 $"Circular dependency detected involving {moduleType.TypeName()}");
         }
 
@@ -48,7 +48,7 @@ public sealed class Modules : IReadOnlyCollection<Module>
         var moduleType = module.GetType();
 
         if (_byType.TryGetValue(moduleType, out var existing))
-            throw new Exception.ModuleAlreadyRegistered(
+            throw new HexedException.ModuleAlreadyRegistered(
                 $"Attempted to register {moduleType.TypeName()} via Load(instance) after it was already loaded. Register the instance higher up in the dependency tree, before modules that depend on it are loaded.");
 
         _resolving.Add(moduleType);
@@ -65,7 +65,7 @@ public sealed class Modules : IReadOnlyCollection<Module>
 
             if (globConfigureConflict.Length > 0)
             {
-                throw new Exception.InvalidModuleDeclaration(
+                throw new HexedException.InvalidModuleDeclaration(
                     $"{moduleType.TypeName()} declares both Glob<{globConfigureConflict[0].TypeName()}> and Configure<{globConfigureConflict[0].TypeName()}>, which are incompatible.");
             }
 
@@ -73,7 +73,7 @@ public sealed class Modules : IReadOnlyCollection<Module>
 
             if (useConfigureConflict.Length > 0)
             {
-                throw new Exception.InvalidModuleDeclaration(
+                throw new HexedException.InvalidModuleDeclaration(
                     $"{moduleType.TypeName()} declares both Use<{useConfigureConflict[0].TypeName()}> and Configure<{useConfigureConflict[0].TypeName()}>, which are incompatible.");
             }
 
@@ -81,7 +81,7 @@ public sealed class Modules : IReadOnlyCollection<Module>
             {
                 if (Metadata.UsedModules(usedType).Contains(moduleType))
                 {
-                    throw new Exception.CircularDependency(
+                    throw new HexedException.CircularDependency(
                         $"Circular dependency between {moduleType.TypeName()} and {usedType.TypeName()}");
                 }
 
@@ -114,7 +114,7 @@ public sealed class Modules : IReadOnlyCollection<Module>
     {
         if (component is Module)
         {
-            throw new Exception.InvalidConfiguration(
+            throw new HexedException.InvalidConfiguration(
                 $"Cannot configure module {typeof(TComponent).TypeName()}, use Load() instead");
         }
 

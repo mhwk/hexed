@@ -72,9 +72,9 @@ public class ModulesTest
         var a = () => modules.Load<CircularUseA>();
         var b = () => modules.Load<CircularUseB>();
 
-        a.Should().Throw<Exception.CircularDependency>()
+        a.Should().Throw<HexedException.CircularDependency>()
             .WithMessage($"Circular dependency between {typeof(CircularUseA).TypeName()} and {typeof(CircularUseB).TypeName()}");
-        b.Should().Throw<Exception.CircularDependency>()
+        b.Should().Throw<HexedException.CircularDependency>()
             .WithMessage($"Circular dependency between {typeof(CircularUseB).TypeName()} and {typeof(CircularUseA).TypeName()}");
     }
 
@@ -86,10 +86,10 @@ public class ModulesTest
         var a = () => modules.Load<CircularConfigureA>();
         var b = () => modules.Load<CircularConfigureB>();
 
-        a.Should().Throw<Exception.CircularDependency>()
+        a.Should().Throw<HexedException.CircularDependency>()
             .WithMessage(
                 $"Circular dependency between {typeof(CircularConfigureA).TypeName()} and {typeof(CircularConfigureB).TypeName()}");
-        b.Should().Throw<Exception.CircularDependency>()
+        b.Should().Throw<HexedException.CircularDependency>()
             .WithMessage(
                 $"Circular dependency between {typeof(CircularConfigureB).TypeName()} and {typeof(CircularConfigureA).TypeName()}");
     }
@@ -182,7 +182,7 @@ public class ModulesTest
 
         var act = () => modules.Configure(new ModuleA());
 
-        act.Should().Throw<Exception.InvalidConfiguration>()
+        act.Should().Throw<HexedException.InvalidConfiguration>()
             .WithMessage($"Cannot configure module {typeof(ModuleA).TypeName()}, use Load() instead");
     }
 
@@ -194,7 +194,7 @@ public class ModulesTest
 
         var act = () => modules.Load(new ModuleA());
 
-        act.Should().Throw<Exception.ModuleAlreadyRegistered>()
+        act.Should().Throw<HexedException.ModuleAlreadyRegistered>()
             .WithMessage(
                 $"Attempted to register {typeof(ModuleA).TypeName()} via Load(instance) after it was already loaded. Register the instance higher up in the dependency tree, before modules that depend on it are loaded.");
     }
@@ -207,7 +207,7 @@ public class ModulesTest
 
         var act = () => modules.Load(new ModuleA());
 
-        act.Should().Throw<Exception.ModuleAlreadyRegistered>()
+        act.Should().Throw<HexedException.ModuleAlreadyRegistered>()
             .WithMessage(
                 $"Attempted to register {typeof(ModuleA).TypeName()} via Load(instance) after it was already loaded. Register the instance higher up in the dependency tree, before modules that depend on it are loaded.");
     }
@@ -229,7 +229,7 @@ public class ModulesTest
 
         var load = () => modules.Load<DeepCircularA>();
 
-        load.Should().Throw<Exception.CircularDependency>()
+        load.Should().Throw<HexedException.CircularDependency>()
             .WithMessage($"Circular dependency detected involving {typeof(DeepCircularA).TypeName()}");
     }
 
@@ -240,7 +240,7 @@ public class ModulesTest
 
         var load = () => modules.Load<SelfConfiguring>();
 
-        load.Should().Throw<Exception.CircularDependency>()
+        load.Should().Throw<HexedException.CircularDependency>()
             .WithMessage($"Circular dependency detected involving {typeof(SelfConfiguring).TypeName()}");
     }
 
@@ -263,7 +263,7 @@ public class ModulesTest
 
         var load = () => modules.Load<GlobAndConfigureConflict>();
 
-        load.Should().Throw<Exception.InvalidModuleDeclaration>()
+        load.Should().Throw<HexedException.InvalidModuleDeclaration>()
             .WithMessage($"*Glob<{typeof(ModuleForConflict).TypeName()}>*");
     }
 
@@ -274,7 +274,7 @@ public class ModulesTest
 
         var load = () => modules.Load<UseAndConfigureConflict>();
 
-        load.Should().Throw<Exception.InvalidModuleDeclaration>()
+        load.Should().Throw<HexedException.InvalidModuleDeclaration>()
             .WithMessage($"*Use<{typeof(ModuleForConflict).TypeName()}>*");
     }
 

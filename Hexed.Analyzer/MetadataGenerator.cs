@@ -189,7 +189,7 @@ public sealed class MetadataGenerator : IIncrementalGenerator
                 $"        if (moduleType == typeof({GlobalType(module)})) return new {GlobalType(module)}();");
         }
 
-        sb.AppendLine("        throw new global::Hexed.Exception.UnknownModule($\"Unknown module type {moduleType}\");");
+        sb.AppendLine("        throw new global::Hexed.HexedException.UnknownModule($\"Unknown module type {moduleType}\");");
         sb.AppendLine("    }");
         sb.AppendLine();
 
@@ -210,7 +210,7 @@ public sealed class MetadataGenerator : IIncrementalGenerator
         }
 
         sb.AppendLine(
-            "        throw new global::Hexed.Exception.UnknownConfigureInvocation($\"Unknown configure invocation {module.GetType()} / {configurableType}\");");
+            "        throw new global::Hexed.HexedException.UnknownConfigureInvocation($\"Unknown configure invocation {module.GetType()} / {configurableType}\");");
         sb.AppendLine("    }");
         sb.AppendLine("}");
         sb.AppendLine();

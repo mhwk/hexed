@@ -5,8 +5,13 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>0.13.0</Version>
+    <Version>0.14.0</Version>
     <PackageReleaseNotes>
+       0.14.0
+       - Glob: replace regex with O(n) span-based wildcard matcher
+       - Add Metadata.AssertValidModule default method, move validation out of Modules.Load
+       - Generator: pregenerate static readonly Type[] fields to avoid allocation on lookup
+       - Metadata: return Type[] instead of IEnumerable&lt;Type&gt;, cache in Reflection
        0.13.0
        - Filter open generic module definitions in source generator
        - Fix InvokeConfigure NRE and unwrap TargetInvocationException

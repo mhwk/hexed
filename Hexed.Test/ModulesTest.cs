@@ -13,6 +13,15 @@ public class ModulesTest
     }
 
     [Fact]
+    public void EmptyModulesHasZeroCount()
+    {
+        var modules = new Modules();
+
+        modules.Count.Should().Be(0);
+        modules.Should().BeEmpty();
+    }
+
+    [Fact]
     public void LoadsDependentModules()
     {
         var modules = new Modules();
@@ -141,6 +150,50 @@ public class ModulesTest
         var modules = new Modules();
         modules.Load<Globbing>();
         modules.OfType<Globbed>().Should().HaveCount(1);
+    }
+
+    [Fact]
+    public void LoadsPreCreatedModule()
+    {
+        var modules = new Modules();
+        var preCreated = new ModuleB().WithSomething();
+        modules.Load(preCreated);
+
+        modules.Count.Should().Be(2);
+        modules.OfType<ModuleA>().Should().HaveCount(1);
+        modules.OfType<ModuleB>().First().Something.Should().BeTrue();
+    }
+
+    [Fact]
+    public void LoadSameModuleTwiceReturnsSameInstance()
+    {
+        var modules = new Modules();
+        var first = modules.Load<ModuleD>();
+        var second = modules.Load<ModuleD>();
+
+        modules.Count.Should().Be(4);
+        first.Should().BeSameAs(second);
+    }
+
+    [Fact]
+    public void ConfigureThrowsForModuleType()
+    {
+        var modules = new Modules();
+
+        var act = () => modules.Configure(new ModuleA());
+
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage($"Cannot configure module {typeof(ModuleA).TypeName()}, use Load() instead");
+    }
+
+    [Fact]
+    public void ConfigureWithNoMatchingHandlers()
+    {
+        var modules = new Modules();
+        modules.Load<ModuleA>();
+
+        var configure = () => modules.Configure(new object());
+        configure.Should().NotThrow();
     }
 
     private sealed class ModuleA : Module;

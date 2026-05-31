@@ -244,6 +244,18 @@ public class ModulesTest
             .WithMessage($"Circular dependency detected involving {typeof(SelfConfiguring).TypeName()}");
     }
 
+    [Fact]
+    public void ConfiguresViaInterface()
+    {
+        var modules = new Modules();
+        modules.Load<ModuleWithConcrete>();
+
+        var configurator = new ConcreteConfigurable();
+        modules.Configure<IConfigurable>(configurator);
+
+        configurator.Configured.Should().BeTrue();
+    }
+
     private sealed class ModuleA : Module;
 
     private sealed class ModuleB : Use<ModuleA>
@@ -308,6 +320,21 @@ public class ModulesTest
     {
         public void Configure(SelfConfiguring component)
         {
+        }
+    }
+
+    private interface IConfigurable;
+
+    private sealed class ConcreteConfigurable : IConfigurable
+    {
+        public bool Configured { get; set; }
+    }
+
+    private sealed class ModuleWithConcrete : Configure<IConfigurable>
+    {
+        public void Configure(IConfigurable component)
+        {
+            ((ConcreteConfigurable)component).Configured = true;
         }
     }
 }

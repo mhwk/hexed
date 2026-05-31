@@ -100,7 +100,7 @@ public sealed class Modules : IReadOnlyCollection<Module>
 
         foreach (var target in _sorted.OfType<Configure<TComponent>>())
         {
-            Metadata.InvokeConfigure(target, component.GetType(), component);
+            Metadata.InvokeConfigure(target, typeof(TComponent), component);
         }
 
         return this;

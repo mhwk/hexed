@@ -35,7 +35,8 @@ public sealed class Modules : IReadOnlyCollection<Module>
         var moduleType = module.GetType();
 
         if (_byType.TryGetValue(moduleType, out var existing))
-            return (TModule)existing;
+            throw new Exception(
+                $"Attempted to register {moduleType.TypeName()} via Load(instance) after it was already loaded. Register the instance higher up in the dependency tree, before modules that depend on it are loaded.");
         
         var globbedModules = Metadata.GlobbedModules(moduleType).ToArray();
 

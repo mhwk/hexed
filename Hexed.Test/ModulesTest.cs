@@ -187,6 +187,32 @@ public class ModulesTest
     }
 
     [Fact]
+    public void LoadInstanceAfterTypeLoadThrows()
+    {
+        var modules = new Modules();
+        modules.Load<ModuleA>();
+
+        var act = () => modules.Load(new ModuleA());
+
+        act.Should().Throw<Exception>()
+            .WithMessage(
+                $"Attempted to register {typeof(ModuleA).TypeName()} via Load(instance) after it was already loaded. Register the instance higher up in the dependency tree, before modules that depend on it are loaded.");
+    }
+
+    [Fact]
+    public void LoadInstanceAfterInstanceLoadThrows()
+    {
+        var modules = new Modules();
+        modules.Load(new ModuleA());
+
+        var act = () => modules.Load(new ModuleA());
+
+        act.Should().Throw<Exception>()
+            .WithMessage(
+                $"Attempted to register {typeof(ModuleA).TypeName()} via Load(instance) after it was already loaded. Register the instance higher up in the dependency tree, before modules that depend on it are loaded.");
+    }
+
+    [Fact]
     public void ConfigureWithNoMatchingHandlers()
     {
         var modules = new Modules();

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 
 namespace Hexed;
 
@@ -64,12 +65,29 @@ public interface Metadata
                ?? throw new HexedException.ModuleActivation($"Unable to activate module {moduleType}");
 
         public void InvokeConfigure(object module, Type configurableType, object dependency)
-            => typeof(Configure<>)
+        {
+            var method = typeof(Configure<>)
                 .MakeGenericType(configurableType)
                 .GetMethod(
                     nameof(Configure<>.Configure),
-                    BindingFlags.Instance | BindingFlags.Public)!
-                .Invoke(module, [dependency]);
+                    BindingFlags.Instance | BindingFlags.Public);
+
+            if (method is null)
+            {
+                throw new HexedException.UnknownConfigureInvocation(
+                    $"Module {module.GetType()} does not implement Configure<{configurableType}> via a public instance method.");
+            }
+
+            try
+            {
+                method.Invoke(module, [dependency]);
+            }
+            catch (TargetInvocationException ex) when (ex.InnerException is not null)
+            {
+                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                throw;
+            }
+        }
 
         private static IEnumerable<Type> GenericInterfaceArguments(Type type, Type openGeneric)
             => type.GetInterfaces()

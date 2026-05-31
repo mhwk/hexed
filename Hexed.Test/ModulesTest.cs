@@ -176,6 +176,18 @@ public class ModulesTest
     }
 
     [Fact]
+    public void ConfigureExceptionPreservesOriginalType()
+    {
+        var modules = new Modules();
+        modules.Load<ThrowingModule>();
+
+        var act = () => modules.Configure(new Component());
+
+        act.Should().ThrowExactly<InvalidOperationException>()
+            .WithMessage("Test exception");
+    }
+
+    [Fact]
     public void ConfigureThrowsForModuleType()
     {
         var modules = new Modules();
@@ -357,6 +369,14 @@ public class ModulesTest
         public void Configure(IConfigurable component)
         {
             ((ConcreteConfigurable)component).Configured = true;
+        }
+    }
+
+    private sealed class ThrowingModule : Configure<Component>
+    {
+        public void Configure(Component component)
+        {
+            throw new InvalidOperationException("Test exception");
         }
     }
 

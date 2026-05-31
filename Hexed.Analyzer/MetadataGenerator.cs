@@ -35,6 +35,9 @@ public sealed class MetadataGenerator : IIncrementalGenerator
         if (symbol is null || symbol.IsAbstract)
             return null;
 
+        if (symbol.IsGenericType && symbol.IsDefinition)
+            return null;
+
         var moduleType = ctx.SemanticModel.Compilation.GetTypeByMetadataName("Hexed.Module");
 
         if (moduleType is null)

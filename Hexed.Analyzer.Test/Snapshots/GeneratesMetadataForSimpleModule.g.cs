@@ -16,6 +16,8 @@ public sealed class GeneratedMetadata : Metadata
             return [typeof(global::ModuleViaConfigure)];
         if (moduleType == typeof(global::ModuleUsingNested))
             return [typeof(global::Container.NestedModule)];
+        if (moduleType == typeof(global::AnotherModule))
+            return [typeof(global::SomeGeneric<int>)];
         return [];
     }
 
@@ -50,6 +52,8 @@ public sealed class GeneratedMetadata : Metadata
         if (moduleType == typeof(global::ModuleViaConfigure)) return new global::ModuleViaConfigure();
         if (moduleType == typeof(global::Container.NestedModule)) return new global::Container.NestedModule();
         if (moduleType == typeof(global::ModuleUsingNested)) return new global::ModuleUsingNested();
+        if (moduleType == typeof(global::AnotherModule)) return new global::AnotherModule();
+        if (moduleType == typeof(global::SomeGeneric<int>)) return new global::SomeGeneric<int>();
         throw new global::Hexed.HexedException.UnknownModule($"Unknown module type {moduleType}");
     }
 

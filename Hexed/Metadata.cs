@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -15,22 +16,22 @@ public interface Metadata
     /// <summary>
     /// Returns the types this module declares as Use&lt;T&gt; dependencies.
     /// </summary>
-    IEnumerable<Type> UsedModules(Type moduleType);
+    Type[] UsedModules(Type moduleType);
 
     /// <summary>
     /// Returns the types this module declares as Glob&lt;T&gt; dependencies.
     /// </summary>
-    IEnumerable<Type> GlobbedModules(Type moduleType);
+    Type[] GlobbedModules(Type moduleType);
 
     /// <summary>
     /// Returns the module types this module declares as Configure&lt;T&gt; dependencies.
     /// </summary>
-    IEnumerable<Type> ConfiguredModules(Type moduleType);
+    Type[] ConfiguredModules(Type moduleType);
 
     /// <summary>
     /// Returns the component types this module declares as Configure&lt;T&gt; dependencies.
     /// </summary>
-    IEnumerable<Type> ConfiguredComponents(Type componentType);
+    Type[] ConfiguredComponents(Type componentType);
 
     /// <summary>
     /// Creates a module instance by type.
@@ -46,19 +47,30 @@ public interface Metadata
     [RequiresUnreferencedCode("Use Hexed.Analyzer for AOT compatibility.")]
     internal sealed class Reflection : Metadata
     {
-        public IEnumerable<Type> UsedModules(Type moduleType)
-            => GenericInterfaceArguments(moduleType, typeof(Use<>));
+        private readonly ConcurrentDictionary<Type, Type[]> _usedModules = new();
+        
+        private readonly ConcurrentDictionary<Type, Type[]> _globbedModules = new();
+        
+        private readonly ConcurrentDictionary<Type, Type[]> _configuredModules = new();
+        
+        private readonly ConcurrentDictionary<Type, Type[]> _configuredComponents = new();
 
-        public IEnumerable<Type> GlobbedModules(Type moduleType)
-            => GenericInterfaceArguments(moduleType, typeof(Glob<>));
+        public Type[] UsedModules(Type moduleType)
+            => _usedModules.GetOrAdd(moduleType, static t
+                => ExtractArguments(t, typeof(Use<>)));
 
-        public IEnumerable<Type> ConfiguredModules(Type moduleType)
-            => GenericInterfaceArguments(moduleType, typeof(Configure<>))
-                .Where(t => typeof(Module).IsAssignableFrom(t));
+        public Type[] GlobbedModules(Type moduleType)
+            => _globbedModules.GetOrAdd(moduleType, static t
+                => ExtractArguments(t, typeof(Glob<>)));
 
-        public IEnumerable<Type> ConfiguredComponents(Type componentType)
-            => GenericInterfaceArguments(componentType, typeof(Configure<>))
-                .Where(t => !typeof(Module).IsAssignableFrom(t));
+        public Type[] ConfiguredModules(Type moduleType)
+            => _configuredModules.GetOrAdd(moduleType, static t
+                => ExtractArguments(t, typeof(Configure<>)).Where(IsModule).ToArray());
+
+        public Type[] ConfiguredComponents(Type componentType)
+            => _configuredComponents.GetOrAdd(componentType, static t
+                => ExtractArguments(t, typeof(Configure<>)).Where(x
+                    => !IsModule(x)).ToArray());
 
         public Module CreateModule(Type moduleType)
             => (Module?)Activator.CreateInstance(moduleType)
@@ -89,9 +101,12 @@ public interface Metadata
             }
         }
 
-        private static IEnumerable<Type> GenericInterfaceArguments(Type type, Type openGeneric)
+        private static bool IsModule(Type t) => typeof(Module).IsAssignableFrom(t);
+
+        private static Type[] ExtractArguments(Type type, Type openGeneric)
             => type.GetInterfaces()
                 .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == openGeneric)
-                .Select(i => i.GetGenericArguments()[0]);
+                .Select(i => i.GetGenericArguments()[0])
+                .ToArray();
     }
 }

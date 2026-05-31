@@ -57,8 +57,8 @@ public sealed class Modules : IReadOnlyCollection<Module>
         
         try
         {
-            var globbedModules = Metadata.GlobbedModules(moduleType).ToArray();
-            var usedModules = Metadata.UsedModules(moduleType).ToArray();
+            var globbedModules = Metadata.GlobbedModules(moduleType);
+            var usedModules = Metadata.UsedModules(moduleType);
             var configuredTypes = Metadata.ConfiguredModules(moduleType)
                 .Concat(Metadata.ConfiguredComponents(moduleType))
                 .ToArray();

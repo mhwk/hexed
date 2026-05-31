@@ -233,6 +233,17 @@ public class ModulesTest
             .WithMessage($"Circular dependency detected involving {typeof(DeepCircularA).TypeName()}");
     }
 
+    [Fact]
+    public void SelfConfigureThrowsOnCircularDependency()
+    {
+        var modules = new Modules();
+
+        var load = () => modules.Load<SelfConfiguring>();
+
+        load.Should().Throw<Exception.CircularDependency>()
+            .WithMessage($"Circular dependency detected involving {typeof(SelfConfiguring).TypeName()}");
+    }
+
     private sealed class ModuleA : Module;
 
     private sealed class ModuleB : Use<ModuleA>
@@ -292,4 +303,11 @@ public class ModulesTest
     private sealed class DeepCircularB : Use<DeepCircularC>;
 
     private sealed class DeepCircularC : Use<DeepCircularA>;
+
+    private sealed class SelfConfiguring : Configure<SelfConfiguring>
+    {
+        public void Configure(SelfConfiguring component)
+        {
+        }
+    }
 }

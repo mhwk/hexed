@@ -72,9 +72,9 @@ public class ModulesTest
         var a = () => modules.Load<CircularUseA>();
         var b = () => modules.Load<CircularUseB>();
 
-        a.Should().Throw<Exception>()
+        a.Should().Throw<Exception.CircularDependency>()
             .WithMessage($"Circular dependency between {typeof(CircularUseA).TypeName()} and {typeof(CircularUseB).TypeName()}");
-        b.Should().Throw<Exception>()
+        b.Should().Throw<Exception.CircularDependency>()
             .WithMessage($"Circular dependency between {typeof(CircularUseB).TypeName()} and {typeof(CircularUseA).TypeName()}");
     }
 
@@ -86,10 +86,10 @@ public class ModulesTest
         var a = () => modules.Load<CircularConfigureA>();
         var b = () => modules.Load<CircularConfigureB>();
 
-        a.Should().Throw<Exception>()
+        a.Should().Throw<Exception.CircularDependency>()
             .WithMessage(
                 $"Circular dependency between {typeof(CircularConfigureA).TypeName()} and {typeof(CircularConfigureB).TypeName()}");
-        b.Should().Throw<Exception>()
+        b.Should().Throw<Exception.CircularDependency>()
             .WithMessage(
                 $"Circular dependency between {typeof(CircularConfigureB).TypeName()} and {typeof(CircularConfigureA).TypeName()}");
     }
@@ -182,7 +182,7 @@ public class ModulesTest
 
         var act = () => modules.Configure(new ModuleA());
 
-        act.Should().Throw<InvalidOperationException>()
+        act.Should().Throw<Exception.InvalidConfiguration>()
             .WithMessage($"Cannot configure module {typeof(ModuleA).TypeName()}, use Load() instead");
     }
 
@@ -194,7 +194,7 @@ public class ModulesTest
 
         var act = () => modules.Load(new ModuleA());
 
-        act.Should().Throw<Exception>()
+        act.Should().Throw<Exception.ModuleAlreadyRegistered>()
             .WithMessage(
                 $"Attempted to register {typeof(ModuleA).TypeName()} via Load(instance) after it was already loaded. Register the instance higher up in the dependency tree, before modules that depend on it are loaded.");
     }
@@ -207,7 +207,7 @@ public class ModulesTest
 
         var act = () => modules.Load(new ModuleA());
 
-        act.Should().Throw<Exception>()
+        act.Should().Throw<Exception.ModuleAlreadyRegistered>()
             .WithMessage(
                 $"Attempted to register {typeof(ModuleA).TypeName()} via Load(instance) after it was already loaded. Register the instance higher up in the dependency tree, before modules that depend on it are loaded.");
     }

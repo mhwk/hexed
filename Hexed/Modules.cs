@@ -35,7 +35,7 @@ public sealed class Modules : IReadOnlyCollection<Module>
         var moduleType = module.GetType();
 
         if (_byType.TryGetValue(moduleType, out var existing))
-            throw new Exception(
+            throw new Exception.ModuleAlreadyRegistered(
                 $"Attempted to register {moduleType.TypeName()} via Load(instance) after it was already loaded. Register the instance higher up in the dependency tree, before modules that depend on it are loaded.");
         
         var globbedModules = Metadata.GlobbedModules(moduleType).ToArray();
@@ -44,7 +44,7 @@ public sealed class Modules : IReadOnlyCollection<Module>
         {
             if (Metadata.UsedModules(usedType).Contains(moduleType))
             {
-                throw new Exception(
+                throw new Exception.CircularDependency(
                     $"Circular dependency between {moduleType.TypeName()} and {usedType.TypeName()}");
             }
 
@@ -72,7 +72,7 @@ public sealed class Modules : IReadOnlyCollection<Module>
     {
         if (component is Module)
         {
-            throw new InvalidOperationException(
+            throw new Exception.InvalidConfiguration(
                 $"Cannot configure module {typeof(TComponent).TypeName()}, use Load() instead");
         }
 

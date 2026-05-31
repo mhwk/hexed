@@ -46,7 +46,7 @@ public sealed class GeneratedMetadata : Metadata
         if (moduleType == typeof(global::GlobbedModule)) return new global::GlobbedModule();
         if (moduleType == typeof(global::ConfiguringModule)) return new global::ConfiguringModule();
         if (moduleType == typeof(global::ModuleViaConfigure)) return new global::ModuleViaConfigure();
-        throw new InvalidOperationException($"Unknown module type {moduleType}");
+        throw new global::Hexed.Exception.UnknownModule($"Unknown module type {moduleType}");
     }
 
     public void InvokeConfigure(object module, Type configurableType, object dependency)
@@ -55,7 +55,7 @@ public sealed class GeneratedMetadata : Metadata
         { ((global::ConfiguringModule)module).Configure((global::ModuleViaConfigure)dependency); return; }
         if (module is global::ConfiguringModule && configurableType == typeof(global::SomeComponent))
         { ((global::ConfiguringModule)module).Configure((global::SomeComponent)dependency); return; }
-        throw new InvalidOperationException($"Unknown configure invocation {module.GetType()} / {configurableType}");
+        throw new global::Hexed.Exception.UnknownConfigureInvocation($"Unknown configure invocation {module.GetType()} / {configurableType}");
     }
 }
 

@@ -61,7 +61,7 @@ public interface Metadata
 
         public Module CreateModule(Type moduleType)
             => (Module?)Activator.CreateInstance(moduleType)
-               ?? throw new InvalidOperationException($"Unable to activate module {moduleType}");
+               ?? throw new Exception.ModuleActivation($"Unable to activate module {moduleType}");
 
         public void InvokeConfigure(object module, Type configurableType, object dependency)
             => typeof(Configure<>)

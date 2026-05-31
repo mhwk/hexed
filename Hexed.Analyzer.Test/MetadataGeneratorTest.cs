@@ -22,6 +22,11 @@ public class MetadataGeneratorTest
                      }
                      public sealed class ModuleViaConfigure : Module { }
                      public sealed class SomeComponent { }
+                     public sealed class Container
+                     {
+                         public sealed class NestedModule : Module { }
+                     }
+                     public sealed class ModuleUsingNested : Use<Container.NestedModule> { }
                      """;
 
         var (_, diagnostics, generatedSource) = GeneratorTestHelper.Run(source);

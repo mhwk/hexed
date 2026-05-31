@@ -238,6 +238,6 @@ public sealed class MetadataGenerator : IIncrementalGenerator
             .OfType<INamedTypeSymbol>();
 
     private static string GlobalType(INamedTypeSymbol symbol) =>
-        $"global::{symbol.ToDisplayString()}";
+        symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
 }

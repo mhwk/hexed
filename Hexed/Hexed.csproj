@@ -17,7 +17,7 @@
     </TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
 
-  <Target Name="PackAnalyzer" DependsOnTargets="Build">
+  <Target Name="PackAnalyzer">
     <ItemGroup>
       <TfmSpecificPackageFile Include="$([MSBuild]::NormalizePath('$(MSBuildThisFileDirectory)..\Hexed.Analyzer\bin\$(Configuration)\netstandard2.0\Hexed.Analyzer.dll'))"
                               PackagePath="analyzers\dotnet\cs\" />

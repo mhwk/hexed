@@ -5,8 +5,12 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>0.17.0</Version>
+    <Version>0.18.0</Version>
     <PackageReleaseNotes>
+       0.18.0
+       - Convert Metadata from interface/switch-case to per-module record + Registry
+       - Rewrite source generator to emit per-module Metadata in ModuleInitializer
+       - Register all test projects as analyzer consumers; make test module types public
        0.17.0
        - Replace ProjectReference with None item for CI-safe analyzer packaging
        0.16.0

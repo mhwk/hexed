@@ -1,3 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../.props/analyzer.props"/>
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
 </Project>

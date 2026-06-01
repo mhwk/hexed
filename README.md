@@ -87,25 +87,16 @@ public sealed class SomeModule :
 
 ## Native AOT
 
-By default, Hexed uses a reflection-based descriptor to resolve module dependencies. To support native AOT, install `Hexed.Analyzer` alongside `Hexed`:
-
-```sh
-dotnet add package Hexed.Analyzer
-```
-
-`Hexed.Analyzer` generates a reflection-free descriptor at compile time and registers it automatically. Your entry point stays unchanged.
+By default, Hexed uses a reflection-based descriptor to resolve module dependencies. The `Hexed` package ships with a source generator (`Hexed.Analyzer`) that generates a reflection-free descriptor at compile time and registers it automatically. Your entry point stays unchanged.
 
 ### Compatibility
 
 | Package                    | Native AOT |
 |----------------------------|------------|
-| `Hexed`                    | ✓¹         |
-| `Hexed.Analyzer`           | ✓          |
+| `Hexed`                    | ✓          |
 | `Hexed.AspNetCore`         | ✓          |
 | `Hexed.AspNetCore.OpenApi` | ✓          |
 | `Hexed.Critter`            | ✓          |
-
-¹ Requires `Hexed.Analyzer` for native AOT support.
 
 ## Contexts
 

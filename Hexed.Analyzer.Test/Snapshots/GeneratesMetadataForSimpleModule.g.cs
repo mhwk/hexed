@@ -3,79 +3,168 @@ using System;
 
 namespace Hexed;
 
-public sealed class GeneratedMetadata : Metadata
-{
-    private static readonly Type[] s_AppModule_used = [typeof(global::OtherModule)];
-    private static readonly Type[] s_GlobbingModule_used = [typeof(global::GlobbedModule)];
-    private static readonly Type[] s_ConfiguringModule_used = [typeof(global::ModuleViaConfigure)];
-    private static readonly Type[] s_ModuleUsingNested_used = [typeof(global::Container.NestedModule)];
-    private static readonly Type[] s_AnotherModule_used = [typeof(global::SomeGeneric<int>)];
-    private static readonly Type[] s_MyApp_ModuleUsingNamespace_used = [typeof(global::MyApp.NamespacedModule)];
-    private static readonly Type[] s_GlobbingModule_globbed = [typeof(global::GlobbedModule)];
-    private static readonly Type[] s_ConfiguringModule_configured = [typeof(global::ModuleViaConfigure)];
-    private static readonly Type[] s_ConfiguringModule_components = [typeof(global::SomeComponent)];
-
-    public Type[] UsedModules(Type moduleType)
-    {
-        if (moduleType == typeof(global::AppModule)) return s_AppModule_used;
-        if (moduleType == typeof(global::GlobbingModule)) return s_GlobbingModule_used;
-        if (moduleType == typeof(global::ConfiguringModule)) return s_ConfiguringModule_used;
-        if (moduleType == typeof(global::ModuleUsingNested)) return s_ModuleUsingNested_used;
-        if (moduleType == typeof(global::AnotherModule)) return s_AnotherModule_used;
-        if (moduleType == typeof(global::MyApp.ModuleUsingNamespace)) return s_MyApp_ModuleUsingNamespace_used;
-        return [];
-    }
-
-    public Type[] GlobbedModules(Type moduleType)
-    {
-        if (moduleType == typeof(global::GlobbingModule)) return s_GlobbingModule_globbed;
-        return [];
-    }
-
-    public Type[] ConfiguredModules(Type moduleType)
-    {
-        if (moduleType == typeof(global::ConfiguringModule)) return s_ConfiguringModule_configured;
-        return [];
-    }
-
-    public Type[] ConfiguredComponents(Type moduleType)
-    {
-        if (moduleType == typeof(global::ConfiguringModule)) return s_ConfiguringModule_components;
-        return [];
-    }
-
-    public Module CreateModule(Type moduleType)
-    {
-        if (moduleType == typeof(global::AppModule)) return new global::AppModule();
-        if (moduleType == typeof(global::OtherModule)) return new global::OtherModule();
-        if (moduleType == typeof(global::GlobbingModule)) return new global::GlobbingModule();
-        if (moduleType == typeof(global::GlobbedModule)) return new global::GlobbedModule();
-        if (moduleType == typeof(global::ConfiguringModule)) return new global::ConfiguringModule();
-        if (moduleType == typeof(global::ModuleViaConfigure)) return new global::ModuleViaConfigure();
-        if (moduleType == typeof(global::Container.NestedModule)) return new global::Container.NestedModule();
-        if (moduleType == typeof(global::ModuleUsingNested)) return new global::ModuleUsingNested();
-        if (moduleType == typeof(global::AnotherModule)) return new global::AnotherModule();
-        if (moduleType == typeof(global::MyApp.NamespacedModule)) return new global::MyApp.NamespacedModule();
-        if (moduleType == typeof(global::MyApp.ModuleUsingNamespace)) return new global::MyApp.ModuleUsingNamespace();
-        if (moduleType == typeof(global::SomeGeneric<int>)) return new global::SomeGeneric<int>();
-        throw new global::Hexed.HexedException.UnknownModule($"Unknown module type {moduleType}");
-    }
-
-    public void InvokeConfigure(object module, Type configurableType, object dependency)
-    {
-        if (module is global::ConfiguringModule && configurableType == typeof(global::ModuleViaConfigure))
-        { ((global::ConfiguringModule)module).Configure((global::ModuleViaConfigure)dependency); return; }
-        if (module is global::ConfiguringModule && configurableType == typeof(global::SomeComponent))
-        { ((global::ConfiguringModule)module).Configure((global::SomeComponent)dependency); return; }
-        throw new global::Hexed.HexedException.UnknownConfigureInvocation($"Unknown configure invocation {module.GetType()} / {configurableType}");
-    }
-}
-
 internal static class HexedInitializer
 {
     [System.Runtime.CompilerServices.ModuleInitializer]
     internal static void Initialize()
     {
-        global::Hexed.Modules.Metadata = new global::Hexed.GeneratedMetadata();
+        global::Hexed.Modules.Metadata.Register(typeof(global::AppModule), new global::Hexed.Metadata
+        {
+            UsedModules = [typeof(global::OtherModule)],
+            GlobbedModules = [],
+            ConfiguredModules = [],
+            ConfiguredComponents = [],
+            Factory = () => new global::AppModule(),
+            Configure = (module, type, dep) =>
+            {
+                throw new global::Hexed.HexedException.UnknownConfigureInvocation($"Unknown configure invocation {module.GetType()} / {type}");
+            }
+        });
+
+        global::Hexed.Modules.Metadata.Register(typeof(global::OtherModule), new global::Hexed.Metadata
+        {
+            UsedModules = [],
+            GlobbedModules = [],
+            ConfiguredModules = [],
+            ConfiguredComponents = [],
+            Factory = () => new global::OtherModule(),
+            Configure = (module, type, dep) =>
+            {
+                throw new global::Hexed.HexedException.UnknownConfigureInvocation($"Unknown configure invocation {module.GetType()} / {type}");
+            }
+        });
+
+        global::Hexed.Modules.Metadata.Register(typeof(global::GlobbingModule), new global::Hexed.Metadata
+        {
+            UsedModules = [typeof(global::GlobbedModule)],
+            GlobbedModules = [typeof(global::GlobbedModule)],
+            ConfiguredModules = [],
+            ConfiguredComponents = [],
+            Factory = () => new global::GlobbingModule(),
+            Configure = (module, type, dep) =>
+            {
+                throw new global::Hexed.HexedException.UnknownConfigureInvocation($"Unknown configure invocation {module.GetType()} / {type}");
+            }
+        });
+
+        global::Hexed.Modules.Metadata.Register(typeof(global::GlobbedModule), new global::Hexed.Metadata
+        {
+            UsedModules = [],
+            GlobbedModules = [],
+            ConfiguredModules = [],
+            ConfiguredComponents = [],
+            Factory = () => new global::GlobbedModule(),
+            Configure = (module, type, dep) =>
+            {
+                throw new global::Hexed.HexedException.UnknownConfigureInvocation($"Unknown configure invocation {module.GetType()} / {type}");
+            }
+        });
+
+        global::Hexed.Modules.Metadata.Register(typeof(global::ConfiguringModule), new global::Hexed.Metadata
+        {
+            UsedModules = [typeof(global::ModuleViaConfigure)],
+            GlobbedModules = [],
+            ConfiguredModules = [typeof(global::ModuleViaConfigure)],
+            ConfiguredComponents = [typeof(global::SomeComponent)],
+            Factory = () => new global::ConfiguringModule(),
+            Configure = (module, type, dep) =>
+            {
+                if (type == typeof(global::ModuleViaConfigure)) { ((global::ConfiguringModule)module).Configure((global::ModuleViaConfigure)dep); return; }
+                if (type == typeof(global::SomeComponent)) { ((global::ConfiguringModule)module).Configure((global::SomeComponent)dep); return; }
+                throw new global::Hexed.HexedException.UnknownConfigureInvocation($"Unknown configure invocation {module.GetType()} / {type}");
+            }
+        });
+
+        global::Hexed.Modules.Metadata.Register(typeof(global::ModuleViaConfigure), new global::Hexed.Metadata
+        {
+            UsedModules = [],
+            GlobbedModules = [],
+            ConfiguredModules = [],
+            ConfiguredComponents = [],
+            Factory = () => new global::ModuleViaConfigure(),
+            Configure = (module, type, dep) =>
+            {
+                throw new global::Hexed.HexedException.UnknownConfigureInvocation($"Unknown configure invocation {module.GetType()} / {type}");
+            }
+        });
+
+        global::Hexed.Modules.Metadata.Register(typeof(global::Container.NestedModule), new global::Hexed.Metadata
+        {
+            UsedModules = [],
+            GlobbedModules = [],
+            ConfiguredModules = [],
+            ConfiguredComponents = [],
+            Factory = () => new global::Container.NestedModule(),
+            Configure = (module, type, dep) =>
+            {
+                throw new global::Hexed.HexedException.UnknownConfigureInvocation($"Unknown configure invocation {module.GetType()} / {type}");
+            }
+        });
+
+        global::Hexed.Modules.Metadata.Register(typeof(global::ModuleUsingNested), new global::Hexed.Metadata
+        {
+            UsedModules = [typeof(global::Container.NestedModule)],
+            GlobbedModules = [],
+            ConfiguredModules = [],
+            ConfiguredComponents = [],
+            Factory = () => new global::ModuleUsingNested(),
+            Configure = (module, type, dep) =>
+            {
+                throw new global::Hexed.HexedException.UnknownConfigureInvocation($"Unknown configure invocation {module.GetType()} / {type}");
+            }
+        });
+
+        global::Hexed.Modules.Metadata.Register(typeof(global::AnotherModule), new global::Hexed.Metadata
+        {
+            UsedModules = [typeof(global::SomeGeneric<int>)],
+            GlobbedModules = [],
+            ConfiguredModules = [],
+            ConfiguredComponents = [],
+            Factory = () => new global::AnotherModule(),
+            Configure = (module, type, dep) =>
+            {
+                throw new global::Hexed.HexedException.UnknownConfigureInvocation($"Unknown configure invocation {module.GetType()} / {type}");
+            }
+        });
+
+        global::Hexed.Modules.Metadata.Register(typeof(global::MyApp.NamespacedModule), new global::Hexed.Metadata
+        {
+            UsedModules = [],
+            GlobbedModules = [],
+            ConfiguredModules = [],
+            ConfiguredComponents = [],
+            Factory = () => new global::MyApp.NamespacedModule(),
+            Configure = (module, type, dep) =>
+            {
+                throw new global::Hexed.HexedException.UnknownConfigureInvocation($"Unknown configure invocation {module.GetType()} / {type}");
+            }
+        });
+
+        global::Hexed.Modules.Metadata.Register(typeof(global::MyApp.ModuleUsingNamespace), new global::Hexed.Metadata
+        {
+            UsedModules = [typeof(global::MyApp.NamespacedModule)],
+            GlobbedModules = [],
+            ConfiguredModules = [],
+            ConfiguredComponents = [],
+            Factory = () => new global::MyApp.ModuleUsingNamespace(),
+            Configure = (module, type, dep) =>
+            {
+                throw new global::Hexed.HexedException.UnknownConfigureInvocation($"Unknown configure invocation {module.GetType()} / {type}");
+            }
+        });
+
+        global::Hexed.Modules.Metadata.Register(typeof(global::SomeGeneric<int>), new global::Hexed.Metadata
+        {
+            UsedModules = [],
+            GlobbedModules = [],
+            ConfiguredModules = [],
+            ConfiguredComponents = [],
+            Factory = () => new global::SomeGeneric<int>(),
+            Configure = (module, type, dep) =>
+            {
+                throw new global::Hexed.HexedException.UnknownConfigureInvocation($"Unknown configure invocation {module.GetType()} / {type}");
+            }
+        });
+
     }
 }

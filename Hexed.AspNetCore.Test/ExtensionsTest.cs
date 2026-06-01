@@ -80,11 +80,11 @@ public sealed class ExtensionsTest
         await modules.RunAsync(new[] { "--test" });
     }
 
-    private sealed class EmptyModule : Module;
+    public sealed class EmptyModule : Module;
 
-    private sealed class GreetingService;
+    public sealed class GreetingService;
 
-    private sealed class GreetingModule : Configure<IServiceCollection>
+    public sealed class GreetingModule : Configure<IServiceCollection>
     {
         public void Configure(IServiceCollection services)
         {
@@ -92,7 +92,7 @@ public sealed class ExtensionsTest
         }
     }
 
-    private sealed class RunnerModule : Configure<IServiceCollection>
+    public sealed class RunnerModule : Configure<IServiceCollection>
     {
         private readonly Func<WebApplication, string[], Task<int>> _runner;
 

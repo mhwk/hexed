@@ -66,7 +66,7 @@ public sealed class Modules : IReadOnlyCollection<Module>
             {
                 var dependency = Load(configuredType);
                 
-                metadata.Configure.Invoke(configuredType, dependency);
+                metadata.Configure.Invoke(module, configuredType, dependency);
             }
 
             _byType[moduleType] = module;
@@ -90,7 +90,8 @@ public sealed class Modules : IReadOnlyCollection<Module>
 
         foreach (var target in _sorted.OfType<Configure<TComponent>>())
         {
-            Metadata[typeof(TComponent)].Configure.Invoke(target.GetType(), target);
+            var metadata = Metadata[target.GetType()];
+            metadata.Configure.Invoke(target, typeof(TComponent), component);
         }
 
         return this;

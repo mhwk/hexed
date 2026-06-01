@@ -300,9 +300,9 @@ public class ModulesTest
             .WithMessage($"*Use<{typeof(ModuleForConflict).TypeName()}>*");
     }
 
-    private sealed class ModuleA : Module;
+    public sealed class ModuleA : Module;
 
-    private sealed class ModuleB : Use<ModuleA>
+    public sealed class ModuleB : Use<ModuleA>
     {
         public bool Something { get; private set; }
 
@@ -314,7 +314,7 @@ public class ModulesTest
         }
     }
 
-    private sealed class ModuleC : Configure<ModuleB>
+    public sealed class ModuleC : Configure<ModuleB>
     {
         public void Configure(ModuleB component)
         {
@@ -322,7 +322,7 @@ public class ModulesTest
         }
     }
 
-    private sealed class ModuleD : Use<ModuleC>, Configure<Component>
+    public sealed class ModuleD : Use<ModuleC>, Configure<Component>
     {
         public void Configure(Component component)
         {
@@ -330,7 +330,7 @@ public class ModulesTest
         }
     }
 
-    private sealed class Component
+    public sealed class Component
     {
         public bool Something { get; private set; }
 
@@ -342,39 +342,39 @@ public class ModulesTest
         }
     }
 
-    private sealed class CircularUseA : Use<CircularUseB>;
+    public sealed class CircularUseA : Use<CircularUseB>;
 
-    private sealed class CircularUseB : Use<CircularUseA>;
+    public sealed class CircularUseB : Use<CircularUseA>;
 
-    private sealed class CircularConfigureA : Use<CircularConfigureB>;
+    public sealed class CircularConfigureA : Use<CircularConfigureB>;
 
-    private sealed class CircularConfigureB : Use<CircularConfigureA>;
+    public sealed class CircularConfigureB : Use<CircularConfigureA>;
 
-    private sealed class Globbing : Glob<Globbed>;
+    public sealed class Globbing : Glob<Globbed>;
 
-    private sealed class Globbed : Module;
+    public sealed class Globbed : Module;
 
-    private sealed class DeepCircularA : Use<DeepCircularB>;
+    public sealed class DeepCircularA : Use<DeepCircularB>;
 
-    private sealed class DeepCircularB : Use<DeepCircularC>;
+    public sealed class DeepCircularB : Use<DeepCircularC>;
 
-    private sealed class DeepCircularC : Use<DeepCircularA>;
+    public sealed class DeepCircularC : Use<DeepCircularA>;
 
-    private sealed class SelfConfiguring : Configure<SelfConfiguring>
+    public sealed class SelfConfiguring : Configure<SelfConfiguring>
     {
         public void Configure(SelfConfiguring component)
         {
         }
     }
 
-    private interface IConfigurable;
+    public interface IConfigurable;
 
-    private sealed class ConcreteConfigurable : IConfigurable
+    public sealed class ConcreteConfigurable : IConfigurable
     {
         public bool Configured { get; set; }
     }
 
-    private sealed class ModuleWithConfigurableInterface : Configure<IConfigurable>
+    public sealed class ModuleWithConfigurableInterface : Configure<IConfigurable>
     {
         public void Configure(IConfigurable component)
         {
@@ -382,7 +382,7 @@ public class ModulesTest
         }
     }
 
-    private sealed class ModuleWithConfigurableConcrete : Configure<ConcreteConfigurable>
+    public sealed class ModuleWithConfigurableConcrete : Configure<ConcreteConfigurable>
     {
         public void Configure(ConcreteConfigurable component)
         {
@@ -390,7 +390,7 @@ public class ModulesTest
         }
     }
 
-    private sealed class ThrowingModule : Configure<Component>
+    public sealed class ThrowingModule : Configure<Component>
     {
         public void Configure(Component component)
         {
@@ -398,16 +398,16 @@ public class ModulesTest
         }
     }
 
-    private sealed class ModuleForConflict : Module;
+    public sealed class ModuleForConflict : Module;
 
-    private sealed class GlobAndConfigureConflict : Glob<ModuleForConflict>, Configure<ModuleForConflict>
+    public sealed class GlobAndConfigureConflict : Glob<ModuleForConflict>, Configure<ModuleForConflict>
     {
         public void Configure(ModuleForConflict component)
         {
         }
     }
 
-    private sealed class UseAndConfigureConflict : Use<ModuleForConflict>, Configure<ModuleForConflict>
+    public sealed class UseAndConfigureConflict : Use<ModuleForConflict>, Configure<ModuleForConflict>
     {
         public void Configure(ModuleForConflict component)
         {

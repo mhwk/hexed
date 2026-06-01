@@ -8,5 +8,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Hexed\Hexed.csproj"/>
     <ProjectReference Include="..\Hexed.AspNetCore\Hexed.AspNetCore.csproj"/>
+    <ProjectReference Include="..\Hexed.Analyzer\Hexed.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
   </ItemGroup>
 </Project>

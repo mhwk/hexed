@@ -5,8 +5,10 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>0.15.0</Version>
+    <Version>0.16.0</Version>
     <PackageReleaseNotes>
+       0.16.0
+       - Fix CI pack: remove DependsOnTargets=Build, add IsPackable to Example
        0.15.0
        - Bundle Hexed.Analyzer into Hexed NuGet package
        0.14.0

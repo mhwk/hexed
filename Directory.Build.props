@@ -5,8 +5,10 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>0.14.0</Version>
+    <Version>0.15.0</Version>
     <PackageReleaseNotes>
+       0.15.0
+       - Bundle Hexed.Analyzer into Hexed NuGet package
        0.14.0
        - Glob: replace regex with O(n) span-based wildcard matcher
        - Add Metadata.AssertValidModule default method, move validation out of Modules.Load

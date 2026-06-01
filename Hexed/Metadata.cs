@@ -12,144 +12,94 @@ namespace Hexed;
 /// <summary>
 /// Describes module dependency and configuration relationships.
 /// </summary>
-public interface Metadata
+public sealed record Metadata
 {
     /// <summary>
-    /// Returns the types this module declares as Use&lt;T&gt; dependencies.
+    /// The types the module declares as Use&lt;T&gt; dependencies.
     /// </summary>
-    Type[] UsedModules(Type moduleType);
+    public required Type[] UsedModules { get; init; }
 
     /// <summary>
-    /// Returns the types this module declares as Glob&lt;T&gt; dependencies.
+    /// The types the module declares as Glob&lt;T&gt; dependencies.
     /// </summary>
-    Type[] GlobbedModules(Type moduleType);
+    public required Type[] GlobbedModules { get; init; }
 
     /// <summary>
-    /// Returns the module types this module declares as Configure&lt;T&gt; dependencies.
+    /// The module types the module declares as Configure&lt;T&gt; dependencies.
     /// </summary>
-    Type[] ConfiguredModules(Type moduleType);
+    public required Type[] ConfiguredModules { get; init; }
 
     /// <summary>
-    /// Returns the component types this module declares as Configure&lt;T&gt; dependencies.
+    /// The component types the module declares as Configure&lt;T&gt; dependencies.
     /// </summary>
-    Type[] ConfiguredComponents(Type componentType);
+    public required Type[] ConfiguredComponents { get; init; }
 
     /// <summary>
-    /// Creates a module instance by type.
+    /// Create the module instance.
     /// </summary>
-    Module CreateModule(Type moduleType);
+    public required Func<Module> Factory { get; init; }
 
     /// <summary>
     /// Invokes Configure&lt;T&gt;.Configure(dependency) on the given module instance.
     /// </summary>
-    void InvokeConfigure(object module, Type configurableType, object dependency);
+    public required Action<Type, object> Configure { get; init; }
 
-    /// <summary>
-    /// Validates that the module's dependency declarations are consistent.
-    /// Throws <see cref="HexedException.InvalidModuleDeclaration"/> on conflict.
-    /// </summary>
-    void AssertValidModule(Type moduleType)
+    public sealed class Registry
     {
-        static void ThrowConflict(Type mt, string kind, Type ct)
-        {
-            throw new HexedException.InvalidModuleDeclaration(
-                $"{mt.TypeName()} declares both {kind}<{ct.TypeName()}> and Configure<{ct.TypeName()}>, which are incompatible.");
-        }
-
-        var globbed = GlobbedModules(moduleType);
-        var used = UsedModules(moduleType);
-
-        foreach (var t in ConfiguredModules(moduleType))
-        {
-            if (Array.IndexOf(globbed, t) >= 0)
-            {
-                ThrowConflict(moduleType, "Glob", t);
-            }
-
-            if (Array.IndexOf(used, t) >= 0)
-            {
-                ThrowConflict(moduleType, "Use", t);
-            }
-        }
-
-        foreach (var t in ConfiguredComponents(moduleType))
-        {
-            if (Array.IndexOf(globbed, t) >= 0)
-            {
-                ThrowConflict(moduleType, "Glob", t);
-            }
-
-            if (Array.IndexOf(used, t) >= 0)
-            {
-                ThrowConflict(moduleType, "Use", t);
-            }
-        }
-    }
-
-    [RequiresDynamicCode("Use Hexed.Analyzer for AOT compatibility.")]
-    [RequiresUnreferencedCode("Use Hexed.Analyzer for AOT compatibility.")]
-    internal sealed class Reflection : Metadata
-    {
-        private readonly ConcurrentDictionary<Type, Type[]> _usedModules = new();
+        private readonly ConcurrentDictionary<string, Metadata> _byType = new();
         
-        private readonly ConcurrentDictionary<Type, Type[]> _globbedModules = new();
-        
-        private readonly ConcurrentDictionary<Type, Type[]> _configuredModules = new();
-        
-        private readonly ConcurrentDictionary<Type, Type[]> _configuredComponents = new();
-
-        public Type[] UsedModules(Type moduleType)
-            => _usedModules.GetOrAdd(moduleType, static t
-                => ExtractArguments(t, typeof(Use<>)));
-
-        public Type[] GlobbedModules(Type moduleType)
-            => _globbedModules.GetOrAdd(moduleType, static t
-                => ExtractArguments(t, typeof(Glob<>)));
-
-        public Type[] ConfiguredModules(Type moduleType)
-            => _configuredModules.GetOrAdd(moduleType, static t
-                => ExtractArguments(t, typeof(Configure<>)).Where(IsModule).ToArray());
-
-        public Type[] ConfiguredComponents(Type componentType)
-            => _configuredComponents.GetOrAdd(componentType, static t
-                => ExtractArguments(t, typeof(Configure<>)).Where(x
-                    => !IsModule(x)).ToArray());
-
-        public Module CreateModule(Type moduleType)
-            => (Module?)Activator.CreateInstance(moduleType)
-               ?? throw new HexedException.ModuleActivation($"Unable to activate module {moduleType}");
-
-        public void InvokeConfigure(object module, Type configurableType, object dependency)
+        public void Register(Type type, Metadata metadata)
         {
-            var method = typeof(Configure<>)
-                .MakeGenericType(configurableType)
-                .GetMethod(
-                    nameof(Configure<>.Configure),
-                    BindingFlags.Instance | BindingFlags.Public);
-
-            if (method is null)
+        }
+        
+        public Metadata this[Type index]
+        {
+            get
             {
-                throw new HexedException.UnknownConfigureInvocation(
-                    $"Module {module.GetType()} does not implement Configure<{configurableType}> via a public instance method.");
-            }
-
-            try
-            {
-                method.Invoke(module, [dependency]);
-            }
-            catch (TargetInvocationException ex) when (ex.InnerException is not null)
-            {
-                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
-                throw;
+                
             }
         }
-
-        private static bool IsModule(Type t) => typeof(Module).IsAssignableFrom(t);
-
-        private static Type[] ExtractArguments(Type type, Type openGeneric)
-            => type.GetInterfaces()
-                .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == openGeneric)
-                .Select(i => i.GetGenericArguments()[0])
-                .ToArray();
+        
+        /// <summary>
+        /// Validates that the module's dependency declarations are consistent.
+        /// Throws <see cref="HexedException.InvalidModuleDeclaration"/> on conflict.
+        /// </summary>
+        public void AssertValidModule(Type moduleType)
+        {
+            // static void ThrowConflict(Type mt, string kind, Type ct)
+            // {
+            //     throw new HexedException.InvalidModuleDeclaration(
+            //         $"{mt.TypeName()} declares both {kind}<{ct.TypeName()}> and Configure<{ct.TypeName()}>, which are incompatible.");
+            // }
+            //
+            // var globbed = GlobbedModules(moduleType);
+            // var used = UsedModules(moduleType);
+            //
+            // foreach (var t in ConfiguredModules(moduleType))
+            // {
+            //     if (Array.IndexOf(globbed, t) >= 0)
+            //     {
+            //         ThrowConflict(moduleType, "Glob", t);
+            //     }
+            //
+            //     if (Array.IndexOf(used, t) >= 0)
+            //     {
+            //         ThrowConflict(moduleType, "Use", t);
+            //     }
+            // }
+            //
+            // foreach (var t in ConfiguredComponents(moduleType))
+            // {
+            //     if (Array.IndexOf(globbed, t) >= 0)
+            //     {
+            //         ThrowConflict(moduleType, "Glob", t);
+            //     }
+            //
+            //     if (Array.IndexOf(used, t) >= 0)
+            //     {
+            //         ThrowConflict(moduleType, "Use", t);
+            //     }
+            // }
+        }
     }
 }

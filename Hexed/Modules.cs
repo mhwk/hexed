@@ -8,16 +8,7 @@ namespace Hexed;
 
 public sealed class Modules : IReadOnlyCollection<Module>
 {
-    public static Metadata Metadata
-    {
-        get
-        {
-#pragma warning disable IL2026, IL3050
-            return field ??= new Metadata.Reflection();
-#pragma warning restore IL2026, IL3050
-        }
-        set;
-    }
+    public static readonly Metadata.Registry Metadata = new();
 
     private readonly Glob _glob = new();
 
@@ -37,7 +28,7 @@ public sealed class Modules : IReadOnlyCollection<Module>
 
         return _byType.TryGetValue(moduleType, out var existing)
             ? existing
-            : Load(Metadata.CreateModule(moduleType));
+            : Load(Metadata[moduleType].Factory.Invoke());
     }
 
     public TModule Load<TModule>() where TModule : Module, new()
@@ -58,13 +49,12 @@ public sealed class Modules : IReadOnlyCollection<Module>
         try
         {
             Metadata.AssertValidModule(moduleType);
+            
+            var metadata = Metadata[moduleType];
 
-            var globbedModules = Metadata.GlobbedModules(moduleType);
-            var usedModules = Metadata.UsedModules(moduleType);
-
-            foreach (var usedType in usedModules)
+            foreach (var usedType in metadata.UsedModules)
             {
-                if (globbedModules.Contains(usedType) && !_glob.IsMatch(usedType))
+                if (metadata.GlobbedModules.Contains(usedType) && !_glob.IsMatch(usedType))
                 {
                     continue;
                 }
@@ -72,10 +62,11 @@ public sealed class Modules : IReadOnlyCollection<Module>
                 Load(usedType);
             }
 
-            foreach (var configuredType in Metadata.ConfiguredModules(moduleType))
+            foreach (var configuredType in metadata.ConfiguredModules)
             {
                 var dependency = Load(configuredType);
-                Metadata.InvokeConfigure(module, configuredType, dependency);
+                
+                metadata.Configure.Invoke(configuredType, dependency);
             }
 
             _byType[moduleType] = module;
@@ -99,7 +90,7 @@ public sealed class Modules : IReadOnlyCollection<Module>
 
         foreach (var target in _sorted.OfType<Configure<TComponent>>())
         {
-            Metadata.InvokeConfigure(target, typeof(TComponent), component);
+            Metadata[typeof(TComponent)].Configure.Invoke(target.GetType(), target);
         }
 
         return this;

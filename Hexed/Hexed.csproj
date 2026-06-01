@@ -6,21 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Hexed.Analyzer\Hexed.Analyzer.csproj"
-                      PrivateAssets="all"
-                      ReferenceOutputAssembly="false" />
+    <None Include="..\Hexed.Analyzer\bin\$(Configuration)\netstandard2.0\Hexed.Analyzer.dll"
+          Pack="true"
+          PackagePath="analyzers\dotnet\cs\"
+          Visible="false" />
   </ItemGroup>
-
-  <PropertyGroup>
-    <TargetsForTfmSpecificContentInPackage>
-      $(TargetsForTfmSpecificContentInPackage);PackAnalyzer
-    </TargetsForTfmSpecificContentInPackage>
-  </PropertyGroup>
-
-  <Target Name="PackAnalyzer">
-    <ItemGroup>
-      <TfmSpecificPackageFile Include="$([MSBuild]::NormalizePath('$(MSBuildThisFileDirectory)..\Hexed.Analyzer\bin\$(Configuration)\netstandard2.0\Hexed.Analyzer.dll'))"
-                              PackagePath="analyzers\dotnet\cs\" />
-    </ItemGroup>
-  </Target>
 </Project>

@@ -152,12 +152,22 @@ public sealed class MetadataGenerator : IIncrementalGenerator
             sb.AppendLine("            Configure = (module, type, dep) =>");
             sb.AppendLine("            {");
 
-            foreach (var configured in allConfigured)
+            if (allConfigured.Count > 0)
             {
-                sb.AppendLine($"                if (type == typeof({GlobalType(configured)})) {{ (({typeName})module).Configure(({GlobalType(configured)})dep); return; }}");
+                sb.AppendLine("                switch (dep)");
+                sb.AppendLine("                {");
+
+                foreach (var configured in allConfigured)
+                {
+                    var configuredType = GlobalType(configured);
+                    sb.AppendLine($"                    case {configuredType} typed:");
+                    sb.AppendLine($"                        (({typeName})module).Configure(typed);");
+                    sb.AppendLine($"                        break;");
+                }
+
+                sb.AppendLine("                }");
             }
 
-            sb.AppendLine("                throw new global::Hexed.HexedException.UnknownConfigureInvocation($\"Unknown configure invocation {module.GetType()} / {type}\");");
             sb.AppendLine("            }");
             sb.AppendLine("        });");
             sb.AppendLine();

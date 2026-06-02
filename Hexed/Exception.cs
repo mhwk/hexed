@@ -22,7 +22,5 @@ public abstract class HexedException : Exception
 
     public sealed class UnknownModule(string? message) : HexedException(message);
 
-    public sealed class UnknownConfigureInvocation(string? message) : HexedException(message);
-
     public sealed class InvalidModuleDeclaration(string? message) : HexedException(message);
 }

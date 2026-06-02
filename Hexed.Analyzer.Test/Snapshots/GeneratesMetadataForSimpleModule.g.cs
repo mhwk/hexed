@@ -17,7 +17,6 @@ internal static class HexedInitializer
             Factory = () => new global::AppModule(),
             Configure = (module, type, dep) =>
             {
-                throw new global::Hexed.HexedException.UnknownConfigureInvocation($"Unknown configure invocation {module.GetType()} / {type}");
             }
         });
 
@@ -30,7 +29,6 @@ internal static class HexedInitializer
             Factory = () => new global::OtherModule(),
             Configure = (module, type, dep) =>
             {
-                throw new global::Hexed.HexedException.UnknownConfigureInvocation($"Unknown configure invocation {module.GetType()} / {type}");
             }
         });
 
@@ -43,7 +41,6 @@ internal static class HexedInitializer
             Factory = () => new global::GlobbingModule(),
             Configure = (module, type, dep) =>
             {
-                throw new global::Hexed.HexedException.UnknownConfigureInvocation($"Unknown configure invocation {module.GetType()} / {type}");
             }
         });
 
@@ -56,7 +53,6 @@ internal static class HexedInitializer
             Factory = () => new global::GlobbedModule(),
             Configure = (module, type, dep) =>
             {
-                throw new global::Hexed.HexedException.UnknownConfigureInvocation($"Unknown configure invocation {module.GetType()} / {type}");
             }
         });
 
@@ -69,9 +65,15 @@ internal static class HexedInitializer
             Factory = () => new global::ConfiguringModule(),
             Configure = (module, type, dep) =>
             {
-                if (type == typeof(global::ModuleViaConfigure)) { ((global::ConfiguringModule)module).Configure((global::ModuleViaConfigure)dep); return; }
-                if (type == typeof(global::SomeComponent)) { ((global::ConfiguringModule)module).Configure((global::SomeComponent)dep); return; }
-                throw new global::Hexed.HexedException.UnknownConfigureInvocation($"Unknown configure invocation {module.GetType()} / {type}");
+                switch (dep)
+                {
+                    case global::ModuleViaConfigure typed:
+                        ((global::ConfiguringModule)module).Configure(typed);
+                        break;
+                    case global::SomeComponent typed:
+                        ((global::ConfiguringModule)module).Configure(typed);
+                        break;
+                }
             }
         });
 
@@ -84,7 +86,6 @@ internal static class HexedInitializer
             Factory = () => new global::ModuleViaConfigure(),
             Configure = (module, type, dep) =>
             {
-                throw new global::Hexed.HexedException.UnknownConfigureInvocation($"Unknown configure invocation {module.GetType()} / {type}");
             }
         });
 
@@ -97,7 +98,6 @@ internal static class HexedInitializer
             Factory = () => new global::Container.NestedModule(),
             Configure = (module, type, dep) =>
             {
-                throw new global::Hexed.HexedException.UnknownConfigureInvocation($"Unknown configure invocation {module.GetType()} / {type}");
             }
         });
 
@@ -110,7 +110,6 @@ internal static class HexedInitializer
             Factory = () => new global::ModuleUsingNested(),
             Configure = (module, type, dep) =>
             {
-                throw new global::Hexed.HexedException.UnknownConfigureInvocation($"Unknown configure invocation {module.GetType()} / {type}");
             }
         });
 
@@ -123,7 +122,6 @@ internal static class HexedInitializer
             Factory = () => new global::AnotherModule(),
             Configure = (module, type, dep) =>
             {
-                throw new global::Hexed.HexedException.UnknownConfigureInvocation($"Unknown configure invocation {module.GetType()} / {type}");
             }
         });
 
@@ -136,7 +134,6 @@ internal static class HexedInitializer
             Factory = () => new global::MyApp.NamespacedModule(),
             Configure = (module, type, dep) =>
             {
-                throw new global::Hexed.HexedException.UnknownConfigureInvocation($"Unknown configure invocation {module.GetType()} / {type}");
             }
         });
 
@@ -149,7 +146,6 @@ internal static class HexedInitializer
             Factory = () => new global::MyApp.ModuleUsingNamespace(),
             Configure = (module, type, dep) =>
             {
-                throw new global::Hexed.HexedException.UnknownConfigureInvocation($"Unknown configure invocation {module.GetType()} / {type}");
             }
         });
 
@@ -162,7 +158,6 @@ internal static class HexedInitializer
             Factory = () => new global::SomeGeneric<int>(),
             Configure = (module, type, dep) =>
             {
-                throw new global::Hexed.HexedException.UnknownConfigureInvocation($"Unknown configure invocation {module.GetType()} / {type}");
             }
         });
 

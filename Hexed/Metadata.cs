@@ -16,7 +16,7 @@ public sealed record Metadata
 
     public required Func<Module> Factory { get; init; }
 
-    public required Action<object, Type, object> Configure { get; init; }
+    public required Action<object, object> Configure { get; init; }
 
     public sealed class Registry
     {

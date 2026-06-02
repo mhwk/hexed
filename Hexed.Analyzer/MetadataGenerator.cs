@@ -149,7 +149,7 @@ public sealed class MetadataGenerator : IIncrementalGenerator
             {
                 sb.AppendLine($"            Factory = () => throw new global::System.InvalidOperationException($\"Module {{typeof({typeName})}} must be created via Load(instance)\"),");
             }
-            sb.AppendLine("            Configure = (module, type, dep) =>");
+            sb.AppendLine("            Configure = (module, dep) =>");
             sb.AppendLine("            {");
 
             if (allConfigured.Count > 0)

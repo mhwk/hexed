@@ -15,7 +15,7 @@ internal static class HexedInitializer
             ConfiguredModules = [],
             ConfiguredComponents = [],
             Factory = () => new global::AppModule(),
-            Configure = (module, type, dep) =>
+            Configure = (module, dep) =>
             {
             }
         });
@@ -27,7 +27,7 @@ internal static class HexedInitializer
             ConfiguredModules = [],
             ConfiguredComponents = [],
             Factory = () => new global::OtherModule(),
-            Configure = (module, type, dep) =>
+            Configure = (module, dep) =>
             {
             }
         });
@@ -39,7 +39,7 @@ internal static class HexedInitializer
             ConfiguredModules = [],
             ConfiguredComponents = [],
             Factory = () => new global::GlobbingModule(),
-            Configure = (module, type, dep) =>
+            Configure = (module, dep) =>
             {
             }
         });
@@ -51,7 +51,7 @@ internal static class HexedInitializer
             ConfiguredModules = [],
             ConfiguredComponents = [],
             Factory = () => new global::GlobbedModule(),
-            Configure = (module, type, dep) =>
+            Configure = (module, dep) =>
             {
             }
         });
@@ -63,7 +63,7 @@ internal static class HexedInitializer
             ConfiguredModules = [typeof(global::ModuleViaConfigure)],
             ConfiguredComponents = [typeof(global::SomeComponent)],
             Factory = () => new global::ConfiguringModule(),
-            Configure = (module, type, dep) =>
+            Configure = (module, dep) =>
             {
                 switch (dep)
                 {
@@ -84,7 +84,7 @@ internal static class HexedInitializer
             ConfiguredModules = [],
             ConfiguredComponents = [],
             Factory = () => new global::ModuleViaConfigure(),
-            Configure = (module, type, dep) =>
+            Configure = (module, dep) =>
             {
             }
         });
@@ -96,7 +96,7 @@ internal static class HexedInitializer
             ConfiguredModules = [],
             ConfiguredComponents = [],
             Factory = () => new global::Container.NestedModule(),
-            Configure = (module, type, dep) =>
+            Configure = (module, dep) =>
             {
             }
         });
@@ -108,7 +108,7 @@ internal static class HexedInitializer
             ConfiguredModules = [],
             ConfiguredComponents = [],
             Factory = () => new global::ModuleUsingNested(),
-            Configure = (module, type, dep) =>
+            Configure = (module, dep) =>
             {
             }
         });
@@ -120,7 +120,7 @@ internal static class HexedInitializer
             ConfiguredModules = [],
             ConfiguredComponents = [],
             Factory = () => new global::AnotherModule(),
-            Configure = (module, type, dep) =>
+            Configure = (module, dep) =>
             {
             }
         });
@@ -132,7 +132,7 @@ internal static class HexedInitializer
             ConfiguredModules = [],
             ConfiguredComponents = [],
             Factory = () => new global::MyApp.NamespacedModule(),
-            Configure = (module, type, dep) =>
+            Configure = (module, dep) =>
             {
             }
         });
@@ -144,7 +144,7 @@ internal static class HexedInitializer
             ConfiguredModules = [],
             ConfiguredComponents = [],
             Factory = () => new global::MyApp.ModuleUsingNamespace(),
-            Configure = (module, type, dep) =>
+            Configure = (module, dep) =>
             {
             }
         });
@@ -156,7 +156,7 @@ internal static class HexedInitializer
             ConfiguredModules = [],
             ConfiguredComponents = [],
             Factory = () => new global::SomeGeneric<int>(),
-            Configure = (module, type, dep) =>
+            Configure = (module, dep) =>
             {
             }
         });

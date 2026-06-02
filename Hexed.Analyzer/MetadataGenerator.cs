@@ -70,17 +70,21 @@ public sealed class MetadataGenerator : IIncrementalGenerator
         if (moduleType is null || useType is null || globType is null || configureType is null)
             return;
 
-        var allModules = new Dictionary<INamedTypeSymbol, INamedTypeSymbol>(SymbolEqualityComparer.Default);
+        var visited = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+        var localModules = new Dictionary<INamedTypeSymbol, INamedTypeSymbol>(SymbolEqualityComparer.Default);
         var queue = new Queue<INamedTypeSymbol>(entryModules);
 
         while (queue.Count > 0)
         {
             var module = queue.Dequeue();
 
-            if (allModules.ContainsKey(module))
+            if (!visited.Add(module))
                 continue;
 
-            allModules[module] = module;
+            if (SymbolEqualityComparer.Default.Equals(module.ContainingAssembly, compilation.Assembly))
+            {
+                localModules[module] = module;
+            }
 
             foreach (var iface in module.AllInterfaces)
             {
@@ -99,7 +103,7 @@ public sealed class MetadataGenerator : IIncrementalGenerator
                 if (argument is null)
                     continue;
 
-                if (IsModule(argument, moduleType) && !allModules.ContainsKey(argument))
+                if (IsModule(argument, moduleType) && !visited.Contains(argument))
                     queue.Enqueue(argument);
             }
         }
@@ -117,7 +121,7 @@ public sealed class MetadataGenerator : IIncrementalGenerator
         sb.AppendLine("    internal static void Initialize()");
         sb.AppendLine("    {");
 
-        foreach (var module in allModules.Values)
+        foreach (var module in localModules.Values)
         {
             var typeName = GlobalType(module);
             var used = GetInterfaceArguments(module, useType)

@@ -5,8 +5,11 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>0.20.0</Version>
+    <Version>0.21.0</Version>
     <PackageReleaseNotes>
+       0.21.0
+       - Use switch pattern matching for Configure dispatch
+       - Remove unused type parameter from Configure delegate
        0.20.0
        - Register constructed generic modules from any assembly
        0.19.0

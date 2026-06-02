@@ -5,8 +5,10 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>0.19.0</Version>
+    <Version>0.20.0</Version>
     <PackageReleaseNotes>
+       0.20.0
+       - Register constructed generic modules from any assembly
        0.19.0
        - Only generate metadata for modules in the current compilation
        0.18.0

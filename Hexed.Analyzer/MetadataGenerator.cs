@@ -81,7 +81,8 @@ public sealed class MetadataGenerator : IIncrementalGenerator
             if (!visited.Add(module))
                 continue;
 
-            if (SymbolEqualityComparer.Default.Equals(module.ContainingAssembly, compilation.Assembly))
+            if (SymbolEqualityComparer.Default.Equals(module.ContainingAssembly, compilation.Assembly) ||
+                (module.IsGenericType && !module.IsDefinition))
             {
                 localModules[module] = module;
             }

@@ -5,8 +5,10 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>0.18.0</Version>
+    <Version>0.19.0</Version>
     <PackageReleaseNotes>
+       0.19.0
+       - Only generate metadata for modules in the current compilation
        0.18.0
        - Convert Metadata from interface/switch-case to per-module record + Registry
        - Rewrite source generator to emit per-module Metadata in ModuleInitializer

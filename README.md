@@ -87,7 +87,7 @@ public sealed class SomeModule :
 
 ## Native AOT
 
-By default, Hexed uses a reflection-based descriptor to resolve module dependencies. The `Hexed` package ships with a source generator (`Hexed.Analyzer`) that generates a reflection-free descriptor at compile time and registers it automatically. Your entry point stays unchanged.
+Hexed is native aot compatible, unless the integrated library is not.
 
 ### Compatibility
 

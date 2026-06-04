@@ -5,8 +5,11 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>0.21.0</Version>
+    <Version>0.22.0</Version>
     <PackageReleaseNotes>
+       0.22.0
+       - Change Type[] to ImmutableArray<Type> in Metadata properties
+       - Add Qowaiv.Analyzers.CSharp package reference
        0.21.0
        - Use switch pattern matching for Configure dispatch
        - Remove unused type parameter from Configure delegate

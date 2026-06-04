@@ -1,18 +1,19 @@
 ﻿using Hexed.Text;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Immutable;
 
 namespace Hexed;
 
 public sealed record Metadata
 {
-    public required Type[] UsedModules { get; init; }
+    public required ImmutableArray<Type> UsedModules { get; init; }
 
-    public required Type[] GlobbedModules { get; init; }
+    public required ImmutableArray<Type> GlobbedModules { get; init; }
 
-    public required Type[] ConfiguredModules { get; init; }
+    public required ImmutableArray<Type> ConfiguredModules { get; init; }
 
-    public required Type[] ConfiguredComponents { get; init; }
+    public required ImmutableArray<Type> ConfiguredComponents { get; init; }
 
     public required Func<Module> Factory { get; init; }
 
@@ -49,12 +50,12 @@ public sealed record Metadata
 
             foreach (var t in metadata.ConfiguredModules)
             {
-                if (Array.IndexOf(globbed, t) >= 0)
+                if (globbed.IndexOf(t) >= 0)
                 {
                     ThrowConflict(moduleType, "Glob", t);
                 }
 
-                if (Array.IndexOf(used, t) >= 0)
+                if (used.IndexOf(t) >= 0)
                 {
                     ThrowConflict(moduleType, "Use", t);
                 }
@@ -62,12 +63,12 @@ public sealed record Metadata
 
             foreach (var t in metadata.ConfiguredComponents)
             {
-                if (Array.IndexOf(globbed, t) >= 0)
+                if (globbed.IndexOf(t) >= 0)
                 {
                     ThrowConflict(moduleType, "Glob", t);
                 }
 
-                if (Array.IndexOf(used, t) >= 0)
+                if (used.IndexOf(t) >= 0)
                 {
                     ThrowConflict(moduleType, "Use", t);
                 }

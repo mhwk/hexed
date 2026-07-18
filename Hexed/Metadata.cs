@@ -7,13 +7,13 @@ namespace Hexed;
 
 public sealed record Metadata
 {
-    public required ImmutableArray<Type> UsedModules { get; init; }
+    public ImmutableArray<Type> UsedModules { get; init; } = [];
 
-    public required ImmutableArray<Type> GlobbedModules { get; init; }
+    public ImmutableArray<Type> GlobbedModules { get; init; } = [];
 
-    public required ImmutableArray<Type> ConfiguredModules { get; init; }
+    public ImmutableArray<Type> ConfiguredModules { get; init; } = [];
 
-    public required ImmutableArray<Type> ConfiguredComponents { get; init; }
+    public ImmutableArray<Type> ConfiguredComponents { get; init; } = [];
 
     public required Func<Module> Factory { get; init; }
 
@@ -34,6 +34,18 @@ public sealed record Metadata
             {
                 if (_byType.TryGetValue(index, out var metadata))
                 {
+                    if (index.IsConstructedGenericType
+                        && _byType.TryGetValue(index.GetGenericTypeDefinition(), out var open))
+                    {
+                        return metadata with
+                        {
+                            UsedModules = open.UsedModules,
+                            GlobbedModules = open.GlobbedModules,
+                            ConfiguredModules = open.ConfiguredModules,
+                            ConfiguredComponents = open.ConfiguredComponents,
+                        };
+                    }
+
                     return metadata;
                 }
 

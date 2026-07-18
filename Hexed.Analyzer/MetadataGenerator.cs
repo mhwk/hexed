@@ -35,9 +35,6 @@ public sealed class MetadataGenerator : IIncrementalGenerator
         if (symbol is null || symbol.IsAbstract)
             return null;
 
-        if (symbol.IsGenericType && symbol.IsDefinition)
-            return null;
-
         var moduleType = ctx.SemanticModel.Compilation.GetTypeByMetadataName("Hexed.Module");
 
         if (moduleType is null)
@@ -124,7 +121,8 @@ public sealed class MetadataGenerator : IIncrementalGenerator
 
         foreach (var module in localModules.Values)
         {
-            var typeName = GlobalType(module);
+            var typeName = TypeOfString(module);
+            var castType = GlobalType(module);
             var used = GetInterfaceArguments(module, useType)
                 .Where(t => IsModule(t, moduleType))
                 .ToList();
@@ -135,24 +133,36 @@ public sealed class MetadataGenerator : IIncrementalGenerator
             var configuredModules = allConfigured.Where(t => IsModule(t, moduleType)).ToList();
             var components = allConfigured.Where(t => !IsModule(t, moduleType)).ToList();
 
+            var isOpenGeneric = module.IsGenericType && module.IsDefinition;
+            var isForeignClosedGeneric = module.IsGenericType && !module.IsDefinition
+                && !SymbolEqualityComparer.Default.Equals(module.ContainingAssembly, compilation.Assembly);
+
+            if (isForeignClosedGeneric)
+            {
+                used.Clear();
+                globbed.Clear();
+                configuredModules.Clear();
+                components.Clear();
+            }
+
             sb.AppendLine($"        global::Hexed.Modules.Metadata.Register(typeof({typeName}), new global::Hexed.Metadata");
             sb.AppendLine("        {");
-            sb.AppendLine($"            UsedModules = [{string.Join(", ", used.Select(t => $"typeof({GlobalType(t)})"))}],");
-            sb.AppendLine($"            GlobbedModules = [{string.Join(", ", globbed.Select(t => $"typeof({GlobalType(t)})"))}],");
-            sb.AppendLine($"            ConfiguredModules = [{string.Join(", ", configuredModules.Select(t => $"typeof({GlobalType(t)})"))}],");
-            sb.AppendLine($"            ConfiguredComponents = [{string.Join(", ", components.Select(t => $"typeof({GlobalType(t)})"))}],");
-            if (module.Constructors.Any(c => c.Parameters.Length == 0 && !c.IsStatic))
+            sb.AppendLine($"            UsedModules = [{string.Join(", ", used.Select(t => $"typeof({TypeOfString(t)})"))}],");
+            sb.AppendLine($"            GlobbedModules = [{string.Join(", ", globbed.Select(t => $"typeof({TypeOfString(t)})"))}],");
+            sb.AppendLine($"            ConfiguredModules = [{string.Join(", ", configuredModules.Select(t => $"typeof({TypeOfString(t)})"))}],");
+            sb.AppendLine($"            ConfiguredComponents = [{string.Join(", ", components.Select(t => $"typeof({TypeOfString(t)})"))}],");
+            if (isOpenGeneric || (!isForeignClosedGeneric && !module.Constructors.Any(c => c.Parameters.Length == 0 && !c.IsStatic)))
             {
-                sb.AppendLine($"            Factory = () => new {typeName}(),");
+                sb.AppendLine($"            Factory = () => throw new global::System.InvalidOperationException($\"Module {{typeof({typeName})}} must be created via Load(instance)\"),");
             }
             else
             {
-                sb.AppendLine($"            Factory = () => throw new global::System.InvalidOperationException($\"Module {{typeof({typeName})}} must be created via Load(instance)\"),");
+                sb.AppendLine($"            Factory = () => new {castType}(),");
             }
             sb.AppendLine("            Configure = (module, dep) =>");
             sb.AppendLine("            {");
 
-            if (allConfigured.Count > 0)
+            if (!isOpenGeneric && allConfigured.Count > 0)
             {
                 sb.AppendLine("                switch (dep)");
                 sb.AppendLine("                {");
@@ -161,7 +171,7 @@ public sealed class MetadataGenerator : IIncrementalGenerator
                 {
                     var configuredType = GlobalType(configured);
                     sb.AppendLine($"                    case {configuredType} typed:");
-                    sb.AppendLine($"                        (({typeName})module).Configure(typed);");
+                    sb.AppendLine($"                        (({castType})module).Configure(typed);");
                     sb.AppendLine($"                        break;");
                 }
 
@@ -192,4 +202,18 @@ public sealed class MetadataGenerator : IIncrementalGenerator
 
     private static string GlobalType(INamedTypeSymbol symbol) =>
         symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+    private static string TypeOfString(INamedTypeSymbol symbol)
+    {
+        if (symbol.IsGenericType && symbol.IsDefinition)
+        {
+            var baseName = symbol.ToDisplayString(new SymbolDisplayFormat(
+                globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.Included,
+                typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
+                genericsOptions: SymbolDisplayGenericsOptions.None));
+            var arity = symbol.TypeParameters.Length;
+            return $"{baseName}<{new string(',', arity - 1)}>";
+        }
+        return symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+    }
 }

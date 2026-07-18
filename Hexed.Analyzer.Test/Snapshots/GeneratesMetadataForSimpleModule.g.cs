@@ -113,6 +113,18 @@ internal static class HexedInitializer
             }
         });
 
+        global::Hexed.Modules.Metadata.Register(typeof(global::SomeGeneric<>), new global::Hexed.Metadata
+        {
+            UsedModules = [],
+            GlobbedModules = [],
+            ConfiguredModules = [],
+            ConfiguredComponents = [],
+            Factory = () => throw new global::System.InvalidOperationException($"Module {typeof(global::SomeGeneric<>)} must be created via Load(instance)"),
+            Configure = (module, dep) =>
+            {
+            }
+        });
+
         global::Hexed.Modules.Metadata.Register(typeof(global::AnotherModule), new global::Hexed.Metadata
         {
             UsedModules = [typeof(global::SomeGeneric<int>)],

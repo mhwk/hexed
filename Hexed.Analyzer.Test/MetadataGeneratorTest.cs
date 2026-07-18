@@ -42,7 +42,7 @@ public class MetadataGeneratorTest
     }
 
     [Fact]
-    public void EmitsInternalModuleFromOtherAssemblyInUsedModules()
+    public void ExcludesInaccessibleModulesForForeignClosedGenericArrays()
     {
         var libSource = """
             using Hexed;
@@ -65,7 +65,7 @@ public class MetadataGeneratorTest
 
         Assert.Empty(diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
         Assert.Contains("typeof(global::Lib.GenericModule<global::MyModule>)", generatedSource);
-        Assert.Contains("typeof(global::Lib.InternalModule)", generatedSource);
+        Assert.DoesNotContain("typeof(global::Lib.InternalModule)", generatedSource);
     }
 
     [Fact]

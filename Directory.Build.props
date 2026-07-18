@@ -5,8 +5,10 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>0.24.0</Version>
+    <Version>0.25.0</Version>
     <PackageReleaseNotes>
+       0.25.0
+       - Refactor accessibility check to handle nested types; include public modules from other assemblies
        0.24.0
        - Cleaned up unused files
        0.23.0

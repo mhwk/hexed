@@ -69,7 +69,7 @@ public class MetadataGeneratorTest
     }
 
     [Fact]
-    public void ExcludesNonGenericModuleFromOtherAssemblyInUsedModules()
+    public void IncludesPublicModuleFromOtherAssemblyInUsedModules()
     {
         var libSource = """
             using Hexed;
@@ -89,7 +89,7 @@ public class MetadataGeneratorTest
         var (_, diagnostics, generatedSource) = GeneratorTestHelper.Run(consumerSource, libReference);
 
         Assert.Empty(diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
-        Assert.DoesNotContain("typeof(global::Lib.PublicModule)", generatedSource);
+        Assert.Contains("typeof(global::Lib.PublicModule)", generatedSource);
     }
 
     [Fact]

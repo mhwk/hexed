@@ -5,8 +5,11 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>0.26.0</Version>
+    <Version>0.27.0</Version>
     <PackageReleaseNotes>
+       0.27.0
+       - Support open generic modules with runtime metadata merging
+       - Add tests for open generic metadata merging and foreign closed generics
        0.26.0
        - Remove accessibility filtering from source generator
        0.25.0

@@ -127,18 +127,13 @@ public sealed class MetadataGenerator : IIncrementalGenerator
             var typeName = GlobalType(module);
             var used = GetInterfaceArguments(module, useType)
                 .Where(t => IsModule(t, moduleType))
-                .Where(t => IsAccessible(t, compilation.Assembly))
                 .ToList();
             var globbed = GetInterfaceArguments(module, globType)
                 .Where(t => IsModule(t, moduleType))
-                .Where(t => IsAccessible(t, compilation.Assembly))
                 .ToList();
             var allConfigured = GetInterfaceArguments(module, configureType).ToList();
-            var accessibleConfigured = allConfigured
-                .Where(t => IsAccessible(t, compilation.Assembly))
-                .ToList();
-            var configuredModules = accessibleConfigured.Where(t => IsModule(t, moduleType)).ToList();
-            var components = accessibleConfigured.Where(t => !IsModule(t, moduleType)).ToList();
+            var configuredModules = allConfigured.Where(t => IsModule(t, moduleType)).ToList();
+            var components = allConfigured.Where(t => !IsModule(t, moduleType)).ToList();
 
             sb.AppendLine($"        global::Hexed.Modules.Metadata.Register(typeof({typeName}), new global::Hexed.Metadata");
             sb.AppendLine("        {");
@@ -157,12 +152,12 @@ public sealed class MetadataGenerator : IIncrementalGenerator
             sb.AppendLine("            Configure = (module, dep) =>");
             sb.AppendLine("            {");
 
-            if (accessibleConfigured.Count > 0)
+            if (allConfigured.Count > 0)
             {
                 sb.AppendLine("                switch (dep)");
                 sb.AppendLine("                {");
 
-                foreach (var configured in accessibleConfigured)
+                foreach (var configured in allConfigured)
                 {
                     var configuredType = GlobalType(configured);
                     sb.AppendLine($"                    case {configuredType} typed:");
@@ -187,20 +182,6 @@ public sealed class MetadataGenerator : IIncrementalGenerator
     private static bool IsModule(INamedTypeSymbol symbol, INamedTypeSymbol moduleType)
     {
         return symbol.AllInterfaces.Any(i => SymbolEqualityComparer.Default.Equals(i, moduleType));
-    }
-
-    private static bool IsAccessible(INamedTypeSymbol type, IAssemblySymbol assembly)
-    {
-        for (var current = type; current is not null; current = current.ContainingType)
-        {
-            var accessibility = current.DeclaredAccessibility;
-            if (accessibility != Accessibility.Public && accessibility != Accessibility.Internal)
-                return false;
-            if (accessibility == Accessibility.Internal &&
-                !SymbolEqualityComparer.Default.Equals(current.ContainingAssembly, assembly))
-                return false;
-        }
-        return true;
     }
 
     private static IEnumerable<INamedTypeSymbol> GetInterfaceArguments(INamedTypeSymbol symbol, INamedTypeSymbol openGenericType) =>

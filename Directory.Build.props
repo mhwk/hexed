@@ -5,10 +5,12 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>0.23.0</Version>
+    <Version>0.24.0</Version>
     <PackageReleaseNotes>
+       0.24.0
+       - Cleaned up unused files
        0.23.0
-       - Exclude generating metadata for non-generic modules from other assemblies
+       - Exclude non-generic modules from other assemblies in source generator
        0.22.0
        - Change Type[] to ImmutableArray&lt;Type&gt; in Metadata properties
        - Add Qowaiv.Analyzers.CSharp package reference

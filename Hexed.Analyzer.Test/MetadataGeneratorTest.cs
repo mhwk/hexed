@@ -108,4 +108,62 @@ public class MetadataGeneratorTest
         Assert.Empty(diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
         Assert.Contains("typeof(global::InternalModule)", generatedSource);
     }
+
+    [Fact]
+    public void RegistersOpenGenericWithDependencyArrays()
+    {
+        var source = """
+            using Hexed;
+
+            public sealed class DepModule : Module { }
+
+            public sealed class SomeComponent { }
+
+            public sealed class OpenModule<T> : Use<DepModule>, Configure<SomeComponent>
+            {
+                public void Configure(SomeComponent component) { }
+            }
+            """;
+
+        var (_, diagnostics, generatedSource) = GeneratorTestHelper.Run(source);
+
+        Assert.Empty(diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+        Assert.Contains("typeof(global::OpenModule<>)", generatedSource);
+        Assert.Contains("typeof(global::DepModule)", generatedSource);
+        Assert.Contains("typeof(global::SomeComponent)", generatedSource);
+    }
+
+    [Fact]
+    public void ForeignClosedGenericEmitsConfigureSwitchWithoutArrays()
+    {
+        var libSource = """
+            using Hexed;
+
+            namespace Lib;
+
+            internal sealed class InternalModule : Module { }
+
+            public sealed class ConfigComponent { }
+
+            public sealed class GenericWithConfig<TModule> : Use<InternalModule>, Configure<ConfigComponent>
+            {
+                public void Configure(ConfigComponent component) { }
+            }
+            """;
+
+        var libReference = GeneratorTestHelper.CompileAssembly(libSource);
+        var consumerSource = """
+            using Hexed;
+
+            public sealed class MyModule : Use<Lib.GenericWithConfig<MyModule>> { }
+            """;
+
+        var (_, diagnostics, generatedSource) = GeneratorTestHelper.Run(consumerSource, libReference);
+
+        Assert.Empty(diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+        Assert.DoesNotContain("typeof(global::Lib.InternalModule)", generatedSource);
+        Assert.DoesNotContain("typeof(global::Lib.ConfigComponent)", generatedSource);
+        Assert.Contains("typeof(global::Lib.GenericWithConfig<global::MyModule>)", generatedSource);
+        Assert.Contains("case global::Lib.ConfigComponent typed:", generatedSource);
+    }
 }

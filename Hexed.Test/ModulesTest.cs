@@ -300,6 +300,42 @@ public class ModulesTest
             .WithMessage($"*Use<{typeof(ModuleForConflict).TypeName()}>*");
     }
 
+    [Fact]
+    public void ConstructedGenericInheritsArraysFromOpenGeneric()
+    {
+        Modules.Metadata.Register(typeof(OpenGenericModule<>), new Metadata
+        {
+            UsedModules = [typeof(DepModule)],
+            ConfiguredComponents = [typeof(SomeConfigComponent)],
+            Factory = () => throw new InvalidOperationException("Open generic"),
+            Configure = (_, _) => { }
+        });
+
+        Modules.Metadata.Register(typeof(OpenGenericModule<int>), new Metadata
+        {
+            Factory = () => new OpenGenericModule<int>(),
+            Configure = (_, _) => { }
+        });
+
+        var metadata = Modules.Metadata[typeof(OpenGenericModule<int>)];
+        metadata.UsedModules.Should().Contain(typeof(DepModule));
+        metadata.ConfiguredComponents.Should().Contain(typeof(SomeConfigComponent));
+        metadata.Factory.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void NonGenericDoesNotAttemptOpenGenericLookup()
+    {
+        Modules.Metadata.Register(typeof(SimpleMetadataModule), new Metadata
+        {
+            Factory = () => new SimpleMetadataModule(),
+            Configure = (_, _) => { }
+        });
+
+        var metadata = Modules.Metadata[typeof(SimpleMetadataModule)];
+        metadata.Factory.Invoke().Should().BeOfType<SimpleMetadataModule>();
+    }
+
     public sealed class ModuleA : Module;
 
     public sealed class ModuleB : Use<ModuleA>
@@ -413,4 +449,12 @@ public class ModulesTest
         {
         }
     }
+
+    public sealed class OpenGenericModule<T> : Module;
+
+    public sealed class DepModule : Module;
+
+    public sealed class SomeConfigComponent;
+
+    public sealed class SimpleMetadataModule : Module;
 }

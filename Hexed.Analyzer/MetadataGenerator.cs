@@ -127,13 +127,22 @@ public sealed class MetadataGenerator : IIncrementalGenerator
             var typeName = GlobalType(module);
             var used = GetInterfaceArguments(module, useType)
                 .Where(t => IsModule(t, moduleType))
+                .Where(t => SymbolEqualityComparer.Default.Equals(t.ContainingAssembly, compilation.Assembly)
+                         || (t.IsGenericType && !t.IsDefinition))
                 .ToList();
             var globbed = GetInterfaceArguments(module, globType)
                 .Where(t => IsModule(t, moduleType))
+                .Where(t => SymbolEqualityComparer.Default.Equals(t.ContainingAssembly, compilation.Assembly)
+                         || (t.IsGenericType && !t.IsDefinition))
                 .ToList();
             var allConfigured = GetInterfaceArguments(module, configureType).ToList();
-            var configuredModules = allConfigured.Where(t => IsModule(t, moduleType)).ToList();
+            var configuredModules = allConfigured
+                .Where(t => IsModule(t, moduleType))
+                .Where(t => SymbolEqualityComparer.Default.Equals(t.ContainingAssembly, compilation.Assembly)
+                         || (t.IsGenericType && !t.IsDefinition))
+                .ToList();
             var components = allConfigured.Where(t => !IsModule(t, moduleType)).ToList();
+            var switchCases = configuredModules.Cast<INamedTypeSymbol>().Concat(components).ToList();
 
             sb.AppendLine($"        global::Hexed.Modules.Metadata.Register(typeof({typeName}), new global::Hexed.Metadata");
             sb.AppendLine("        {");
@@ -152,12 +161,12 @@ public sealed class MetadataGenerator : IIncrementalGenerator
             sb.AppendLine("            Configure = (module, dep) =>");
             sb.AppendLine("            {");
 
-            if (allConfigured.Count > 0)
+            if (switchCases.Count > 0)
             {
                 sb.AppendLine("                switch (dep)");
                 sb.AppendLine("                {");
 
-                foreach (var configured in allConfigured)
+                foreach (var configured in switchCases)
                 {
                     var configuredType = GlobalType(configured);
                     sb.AppendLine($"                    case {configuredType} typed:");

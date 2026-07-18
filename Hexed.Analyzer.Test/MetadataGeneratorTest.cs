@@ -40,4 +40,72 @@ public class MetadataGeneratorTest
         Assert.Empty(diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
         Snapshot.AssertGeneratedSourceMatches(generatedSource!);
     }
+
+    [Fact]
+    public void ExcludesInaccessibleModuleFromUsedModules()
+    {
+        var libSource = """
+            using Hexed;
+
+            namespace Lib;
+
+            internal sealed class InternalModule : Module { }
+
+            public sealed class GenericModule<TModule> : Use<InternalModule> { }
+            """;
+
+        var libReference = GeneratorTestHelper.CompileAssembly(libSource);
+        var consumerSource = """
+            using Hexed;
+
+            public sealed class MyModule : Use<Lib.GenericModule<MyModule>> { }
+            """;
+
+        var (_, diagnostics, generatedSource) = GeneratorTestHelper.Run(consumerSource, libReference);
+
+        Assert.Empty(diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+        Assert.Contains("typeof(global::Lib.GenericModule<global::MyModule>)", generatedSource);
+        Assert.DoesNotContain("typeof(global::Lib.InternalModule)", generatedSource);
+    }
+
+    [Fact]
+    public void ExcludesNonGenericModuleFromOtherAssemblyInUsedModules()
+    {
+        var libSource = """
+            using Hexed;
+
+            namespace Lib;
+
+            public sealed class PublicModule : Module { }
+            """;
+
+        var libReference = GeneratorTestHelper.CompileAssembly(libSource);
+        var consumerSource = """
+            using Hexed;
+
+            public sealed class MyModule : Use<Lib.PublicModule> { }
+            """;
+
+        var (_, diagnostics, generatedSource) = GeneratorTestHelper.Run(consumerSource, libReference);
+
+        Assert.Empty(diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+        Assert.DoesNotContain("typeof(global::Lib.PublicModule)", generatedSource);
+    }
+
+    [Fact]
+    public void IncludesInternalModuleFromSameAssemblyInUsedModules()
+    {
+        var source = """
+            using Hexed;
+
+            internal sealed class InternalModule : Module { }
+
+            public sealed class MyModule : Use<InternalModule> { }
+            """;
+
+        var (_, diagnostics, generatedSource) = GeneratorTestHelper.Run(source);
+
+        Assert.Empty(diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+        Assert.Contains("typeof(global::InternalModule)", generatedSource);
+    }
 }
